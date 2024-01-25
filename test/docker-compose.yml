@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+  mongo-test:
+    image: mongo
+    restart: always
+    ports:
+    - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 'root'
+      MONGO_INITDB_ROOT_PASSWORD: 'c0mm4nd3r'
+
+  commander-test:
+    image: commander:1.0.3
+    restart: always
+    ports:
+    - '46520:46520'
+    depends_on:
+      - mongo-test
