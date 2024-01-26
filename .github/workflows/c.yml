@@ -1,8 +1,6 @@
 name: Tests
 
 on:
-  push:
-    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
 
@@ -23,6 +21,5 @@ jobs:
     - name: testing
       working-directory: .
       run: npm test
-    - name: linting
+    - name: linter
       run: npm run lint
-

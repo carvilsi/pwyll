@@ -2,7 +2,7 @@ const Logger = require('logplease');
 
 export const info = require('./../../package.json');
 
-import config from 'config'; 
+import config from 'config';
 import { findUserByName } from '../controllers/users_controller';
 
 const logLevel = config.get('logLevel');
