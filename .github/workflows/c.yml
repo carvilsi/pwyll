@@ -28,5 +28,5 @@ jobs:
         #npm run build
     - name: testing
       working-directory: .
-      run: docker --version 
+      run: npm test
 
