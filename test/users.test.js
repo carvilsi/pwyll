@@ -4,10 +4,10 @@ const request = require('supertest');
 const expect = require('chai').expect;
 
 describe('users ', () => {
-  const commander_machine = 'http://localhost:46520';
+  const pwyll_machine = 'http://localhost:46520';
 
   it('should create a user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: 'dedalus' })
       .set('Accept', 'application/json')
@@ -19,7 +19,7 @@ describe('users ', () => {
   });
 
   it('should not allow creating an existing user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: 'dedalus' })
       .set('Accept', 'application/json')
@@ -35,7 +35,7 @@ describe('users ', () => {
   });
 
   it('should not allow creating a very long username', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: 'CthulhuTheOneThatSleepsDead' })
       .set('Accept', 'application/json')
@@ -48,7 +48,7 @@ describe('users ', () => {
   });
 
   it('should not allow creating a user without username', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .set('Accept', 'application/json')
       .expect(500)
@@ -60,7 +60,7 @@ describe('users ', () => {
   });
 
   it('should not allow creating a user with empty username', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: '' })
       .set('Accept', 'application/json')
@@ -72,7 +72,7 @@ describe('users ', () => {
   });
 
   it('should not allow creating a user with blank username', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: '   ' })
       .set('Accept', 'application/json')

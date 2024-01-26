@@ -4,7 +4,7 @@ const request = require('supertest');
 const expect = require('chai').expect;
 
 describe('commands CRUD', () => {
-  const commander_machine = 'http://localhost:46520';
+  const pwyll_machine = 'http://localhost:46520';
   let idCommandChar;
   let idCommandBloom;
   let charUserId;
@@ -15,7 +15,7 @@ describe('commands CRUD', () => {
   };
 
   before(done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/user')
       .send({ username: 'char' })
       .set('Accept', 'application/json')
@@ -24,7 +24,7 @@ describe('commands CRUD', () => {
         expect(res.text.length).to.be.equal(26);
         charUserId = JSON.parse(res.text);
         commandObj.userId = charUserId;
-        request(commander_machine)
+        request(pwyll_machine)
           .post('/user')
           .send({ username: 'bloom' })
           .set('Accept', 'application/json')
@@ -38,7 +38,7 @@ describe('commands CRUD', () => {
   });
 
   it('should create a command', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send(commandObj)
       .set('Accept', 'application/json')
@@ -51,7 +51,7 @@ describe('commands CRUD', () => {
   });
 
   it('should create another command for bloom user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send({
         command: 'nodemon src/',
@@ -68,7 +68,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not create a command if provided user does not exists', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send({
         command: 'ls',
@@ -88,7 +88,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not create a command if user is not provided', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send({ command: 'ls', description: 'list' })
       .set('Accept', 'application/json')
@@ -101,7 +101,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not create a command if command is not provided', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send({ description: 'list' })
       .set('Accept', 'application/json')
@@ -114,7 +114,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not create a command if description is not provided', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .post('/command')
       .send({ command: 'ls' })
       .set('Accept', 'application/json')
@@ -128,7 +128,7 @@ describe('commands CRUD', () => {
   });
 
   it('should find a command for any user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/command/find')
       .query({ q: 'nodemon' })
       .set('Accept', 'application/json')
@@ -141,7 +141,7 @@ describe('commands CRUD', () => {
   });
 
   it('should find a command restricted to char user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/command/find')
       .query({
         q: 'nodemon',
@@ -160,14 +160,14 @@ describe('commands CRUD', () => {
   });
 
   it('should delete a command by id and for user bloom', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .delete(`/command/${idCommandBloom}/${bloomUserId}`)
       .set('Accept', 'application/json')
       .expect(200)
       .end((err, res) => {
         const response = JSON.parse(res.text);
         expect(response).to.be.true;
-        request(commander_machine)
+        request(pwyll_machine)
           .get('/command/find')
           .query({ q: 'nodemon' })
           .set('Accept', 'application/json')
@@ -185,7 +185,7 @@ describe('commands CRUD', () => {
       './node_modules/nodemon/bin/nodemon -e js,ts -x ts-node --files src/index.ts';
     const newDescription =
       'dev mode nodemon typescript ts-node from node_modules';
-    request(commander_machine)
+    request(pwyll_machine)
       .put('/command')
       .send({
         command: newCommand,
@@ -198,7 +198,7 @@ describe('commands CRUD', () => {
       .end((err, res) => {
         const response = JSON.parse(res.text);
         expect(response).to.be.true;
-        request(commander_machine)
+        request(pwyll_machine)
           .get('/command/find')
           .query({ q: 'nodemon' })
           .set('Accept', 'application/json')
@@ -215,7 +215,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not delete a command without valid commandId', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .delete(`/command/idCommandWrong/${bloomUserId}`)
       .set('Accept', 'application/json')
       .expect(500)
@@ -227,7 +227,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not delete a command without valid userId', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .delete(`/command/${idCommandBloom}/bloomUserIdWrong`)
       .set('Accept', 'application/json')
       .expect(500)
@@ -239,7 +239,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not find a command restricted to invalid user', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/command/find')
       .query({
         q: 'nodemon',
@@ -254,7 +254,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not find a command if query is not provided', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/command/find')
       .set('Accept', 'application/json')
       .expect(500)
@@ -266,7 +266,7 @@ describe('commands CRUD', () => {
   });
 
   it('should not find a command by query if does not match any', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/command/find')
       .query({ q: 'foobar' })
       .set('Accept', 'application/json')

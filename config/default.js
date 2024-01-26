@@ -4,9 +4,7 @@ module.exports = {
   mongodb: {
     user: 'root',
     password: 'c0mm4nd3r',
-    // ip: 'localhost',
-    // ip: 'mongo',
-    ip: 'mongo-test',
+    ip: 'localhost',
     port: 27017,
     db: 'commander',
     collections: {

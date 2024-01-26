@@ -1,12 +1,15 @@
 FROM node:alpine
 
-RUN mkdir -p /usr/commander
-WORKDIR /usr/commander
-COPY . /usr/commander/
+ARG NODE_ENV
+ENV NODE_ENV $NODE_ENV
+
+RUN mkdir -p /usr/pwyll
+WORKDIR /usr/pwyll
+COPY . /usr/pwyll/
 
 RUN npm install -g npm
 RUN npm install
 RUN npm install typescript -g
 RUN npm run build
-RUN export NODE_ENV=test
 CMD npm start
+

@@ -5,10 +5,10 @@ const expect = require('chai').expect;
 const pckg = require('./../package.json');
 
 describe('get the info', () => {
-  const commander_machine = 'http://localhost:46520';
+  const pwyll_machine = 'http://localhost:46520';
 
   it('should retieve info', done => {
-    request(commander_machine)
+    request(pwyll_machine)
       .get('/')
       .expect(200)
       .end((err, res) => {

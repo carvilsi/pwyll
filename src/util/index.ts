@@ -8,7 +8,7 @@ import { findUserByName } from '../controllers/users_controller';
 const logLevel = config.get('logLevel');
 
 Logger.setLogLevel(logLevel);
-export const logger = Logger.create('commander');
+export const logger = Logger.create(`${info.name}`);
 
 export function paramCheck(
   param: any,

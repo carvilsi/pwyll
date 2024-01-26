@@ -12,8 +12,8 @@ services:
     volumes:
       - ./mongo-volume:/data/db
 
-  commander:
-    image: commander:1.0.3
+  pwyll:
+    image: pwyll:1.0.3
     restart: always
     ports:
     - '46520:46520'
