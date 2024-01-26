@@ -13,7 +13,7 @@ describe('get the info', () => {
       .expect(200)
       .end((err, res) => {
         const infoText = res.text;
-        const regexp = new RegExp(`${pckg.name}@lol${pckg.version}`, 'i');
+        const regexp = new RegExp(`${pckg.name}@${pckg.version}`, 'i');
         expect(regexp.test(infoText)).to.be.true;
         done();
       });

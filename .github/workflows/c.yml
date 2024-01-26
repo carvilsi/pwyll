@@ -17,16 +17,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18.x'
-    #- name: dependencies
-      #run: |
-        #sudo apt update
-        #sudo apt install libsystemd-dev 
     - name: typescript
       run: |
         npm install
-        #npm install typescript -g
-        #npm run build
     - name: testing
       working-directory: .
       run: npm test
+    - name: linting
+      run: npm run lint
 
