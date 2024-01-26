@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: nodejs
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    #- name: dependencies
+      #run: |
+        #sudo apt update
+        #sudo apt install libsystemd-dev 
+    - name: typescript
+      run: |
+        npm install
+        #npm install typescript -g
+        #npm run build
+    - name: testing
+      working-directory: .
+      run: docker --version 
+
