@@ -167,22 +167,21 @@ describe('commands CRUD', () => {
     request(pwyll_machine)
       .delete(`/command/${idCommandSecondUser}/${secondUserId}`)
       .set('Accept', 'application/json')
-      .expect(200);
-    done();
-    // .end((err, res) => {
-    //   const response = JSON.parse(res.text);
-    //   expect(response).to.be.true;
-    //   request(pwyll_machine)
-    //     .get('/command/find')
-    //     .query({ q: 'nodemon' })
-    //     .set('Accept', 'application/json')
-    //     .expect(200)
-    //     .end((err, res) => {
-    //       const response = JSON.parse(res.text);
-    //       expect(response.length).to.be.equal(1);
-    //       done();
-    //     });
-    // });
+      .expect(200)
+      .end((err, res) => {
+        const response = JSON.parse(res.text);
+        expect(response).to.be.true;
+        request(pwyll_machine)
+          .get('/command/find')
+          .query({ q: 'nodemon' })
+          .set('Accept', 'application/json')
+          .expect(200)
+          .end((err, res) => {
+            const response = JSON.parse(res.text);
+            expect(response.length).to.be.equal(1);
+            done();
+          });
+      });
   });
 
   it('should update a command by id and for first user', done => {
@@ -210,7 +209,6 @@ describe('commands CRUD', () => {
           .expect(200)
           .end((err, res) => {
             const response = JSON.parse(res.text);
-            console.dir(response);
             expect(response.length).to.be.at.least(1);
             expect(response[0].command).to.be.equal(newCommand);
             expect(response[0].description).to.be.equal(newDescription);
