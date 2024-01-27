@@ -25,10 +25,10 @@ const port = config.get('port');
 async function main() {
   try {
     http.listen(port, () => {
-      logger.info('        ┓┓');
-      logger.info(' ┏┓┓┏┏┓┏┃┃');
-      logger.info(' ┣┛┗┻┛┗┫┗┗');
-      logger.info(' ┛     ┛  ');
+      logger.info('           ┓┓');
+      logger.info('    ┏┓┓┏┏┓┏┃┃');
+      logger.info('    ┣┛┗┻┛┗┫┗┗');
+      logger.info('    ┛     ┛  ');
       logger.info('by carvilsi with <3');
       logger.info(`${info.name}@${info.version} running at: ${port}!`);
     });
