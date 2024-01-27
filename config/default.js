@@ -3,10 +3,10 @@ module.exports = {
   logLevel: 'DEBUG',
   mongodb: {
     user: 'root',
-    password: 'c0mm4nd3r',
+    password: 'pwy11',
     ip: 'localhost',
     port: 27017,
-    db: 'commander',
+    db: 'pwyll',
     collections: {
       commands: 'commands',
       users: 'users',

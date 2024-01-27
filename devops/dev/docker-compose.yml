@@ -9,13 +9,3 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: 'root'
       MONGO_INITDB_ROOT_PASSWORD: 'pwy11'
-    volumes:
-      - ./mongo-volume:/data/db
-
-  pwyll:
-    image: pwyll:1.0.3
-    restart: always
-    ports:
-    - '46520:46520'
-    depends_on:
-      - mongo

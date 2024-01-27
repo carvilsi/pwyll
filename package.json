@@ -5,10 +5,10 @@
   "main": "./lib/index.js",
   "scripts": {
     "test": "cd test/; docker-compose down; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 10; ./node_modules/mocha/bin/mocha test/",
-    "dev": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
+    "dev": "cd devops/dev; docker-compose up -d; cd -; nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
     "build": "tsc",
     "start": "node lib/index.js",
-    "lint": "./node_modules/eslint/bin/eslint.js . --ext .ts"
+    "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +37,7 @@
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
     "chai": "^4.3.6",
+    "chance": "^1.1.11",
     "eslint": "^8.14.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-node": "^11.1.0",

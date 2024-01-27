@@ -2,14 +2,17 @@
 /* eslint-disable node/no-unpublished-require */
 const request = require('supertest');
 const expect = require('chai').expect;
+const Chance = require('chance');
 
 describe('users ', () => {
   const pwyll_machine = 'http://localhost:46520';
+  const chance = new Chance();
+  const name = chance.name();
 
   it('should create a user', done => {
     request(pwyll_machine)
       .post('/user')
-      .send({ username: 'dedalus' })
+      .send({ username: name })
       .set('Accept', 'application/json')
       .expect(200)
       .end((err, res) => {
@@ -21,15 +24,12 @@ describe('users ', () => {
   it('should not allow creating an existing user', done => {
     request(pwyll_machine)
       .post('/user')
-      .send({ username: 'dedalus' })
+      .send({ username: name })
       .set('Accept', 'application/json')
       .expect(500)
       .end((err, res) => {
-        expect(
-          /User dedalus already exists, please choose a different/.test(
-            res.text
-          )
-        ).to.be.true;
+        expect(/already exists, please choose a different/.test(res.text)).to.be
+          .true;
         done();
       });
   });
