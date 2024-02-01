@@ -11,5 +11,6 @@ module.exports = {
       commands: 'commands',
       users: 'users',
     },
+    limit: 5,
   },
 };

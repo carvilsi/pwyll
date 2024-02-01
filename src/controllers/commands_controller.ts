@@ -6,6 +6,7 @@ import { findUserById } from './users_controller';
 import _ from 'lodash';
 
 const collectionName = String(config.get('mongodb.collections.commands'));
+const limitFind = Number(config.get('mongodb.limit'));
 
 export async function createCommand(
   comm: string,
@@ -76,7 +77,7 @@ export async function findCommandByQuery(
         ],
       };
     }
-    const results = await collection.find(mongoQuery).toArray();
+    const results = await collection.find(mongoQuery).limit(limitFind).toArray();
     const commands: Command[] = [];
     for (const result of results) {
       const command: Command = {
