@@ -1,6 +1,6 @@
 import express from 'express';
 import config from 'config';
-import { logger, info } from './util/index';
+import { logger, info, errorHandler } from './util/index';
 import commands from './routes/commands';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
@@ -20,6 +20,8 @@ app.use('/command', commands);
 app.use('/user', users);
 app.use(infoapp);
 
+app.use(errorHandler);
+
 const port = config.get('port');
 
 async function main() {
@@ -38,5 +40,4 @@ async function main() {
 }
 
 main();
-// TODO: create sdk
 // TODO: export from pet

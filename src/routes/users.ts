@@ -22,7 +22,11 @@ router.post(
       res.status(200).send(id);
     } catch (e) {
       logger.error(e);
-      next(e);
+      if (e instanceof Error) {
+        next(e.message);
+      } else {
+        next(e);
+      }
     }
   }
 );

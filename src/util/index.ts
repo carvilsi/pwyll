@@ -4,6 +4,7 @@ export const info = require('./../../package.json');
 
 import config from 'config';
 import { findUserByName } from '../controllers/users_controller';
+import express from 'express';
 
 const logLevel = config.get('logLevel');
 
@@ -32,6 +33,17 @@ export function userLengthCheck(username: string): boolean {
 export async function userExistenceCheck(username: string): Promise<boolean> {
   const user = await findUserByName(username);
   if (user != null)
-    throw `User ${username} already exists, please choose a different`;
+    throw `User ${username} already exists, please choose a different one`;
   return true;
+}
+
+export function errorHandler(
+  err: express.ErrorRequestHandler,
+  req: express.Request,
+  res: express.Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: express.NextFunction
+) {
+  res.status(500);
+  res.send({ message: err });
 }

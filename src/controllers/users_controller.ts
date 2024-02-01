@@ -5,6 +5,8 @@ import config from 'config';
 
 const collectionName = String(config.get('mongodb.collections.users'));
 
+//XXX: mongo it's returning a sequental ID, this is not the best
+//approach... maybe add a password or give a generated uuid
 export async function createUser(
   username: string
 ): Promise<ObjectId | undefined> {
