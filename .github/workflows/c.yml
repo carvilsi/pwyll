@@ -20,6 +20,6 @@ jobs:
         npm install
     - name: testing
       working-directory: .
-      run: npm test
+      run: npm run test-ci-cd
     - name: linter
       run: npm run lint

@@ -77,7 +77,10 @@ export async function findCommandByQuery(
         ],
       };
     }
-    const results = await collection.find(mongoQuery).limit(limitFind).toArray();
+    const results = await collection
+      .find(mongoQuery)
+      .limit(limitFind)
+      .toArray();
     const commands: Command[] = [];
     for (const result of results) {
       const command: Command = {
@@ -125,7 +128,7 @@ async function _findCommandById(
           error.message
         )
       ) {
-        throw new Error('Command not found for deleting command');
+        throw new Error('Command not found for deleting');
       } else {
         throw new Error(error.message);
       }

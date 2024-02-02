@@ -224,8 +224,7 @@ describe('commands CRUD', () => {
       .set('Accept', 'application/json')
       .expect(500)
       .end((err, res) => {
-        expect(/Command not found for deleting command/.test(res.text)).to.be
-          .true;
+        expect(/Command not found for deleting/.test(res.text)).to.be.true;
         done();
       });
   });
@@ -236,8 +235,18 @@ describe('commands CRUD', () => {
       .set('Accept', 'application/json')
       .expect(500)
       .end((err, res) => {
-        expect(/User does not exist for deleting command/.test(res.text)).to.be
-          .true;
+        expect(/User does not exist for deleting/.test(res.text)).to.be.true;
+        done();
+      });
+  });
+
+  it('should not delete a command with valid commandID but userID from another user', done => {
+    request(pwyll_machine)
+      .delete(`/command/${idCommandSecondUser}/${firstUserId}`)
+      .set('Accept', 'application/json')
+      .expect(500)
+      .end((err, res) => {
+        expect(/Command not found for deleting/.test(res.text)).to.be.true;
         done();
       });
   });
