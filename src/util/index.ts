@@ -37,7 +37,7 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
   return true;
 }
 
-export function errorHandler(
+export function errorRequestHandler(
   err: express.ErrorRequestHandler,
   req: express.Request,
   res: express.Response,
@@ -46,4 +46,13 @@ export function errorHandler(
 ) {
   res.status(500);
   res.send({ message: err });
+}
+
+export function errorRouteHandler(err: unknown, next: express.NextFunction) {
+  logger.error(err);
+  if (err instanceof Error) {
+    next(err.message);
+  } else {
+    next(err);
+  }
 }

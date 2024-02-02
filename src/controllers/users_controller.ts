@@ -20,7 +20,6 @@ export async function createUser(
     const id: ObjectId = insertResult.insertedId;
     return id;
   } catch (error) {
-    logger.error(error);
     if (error instanceof MongoError) {
       throw new Error(error.message);
     }

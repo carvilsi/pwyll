@@ -1,6 +1,6 @@
 import express from 'express';
 import config from 'config';
-import { logger, info, errorHandler } from './util/index';
+import { logger, info, errorRequestHandler } from './util/index';
 import commands from './routes/commands';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
@@ -20,7 +20,7 @@ app.use('/command', commands);
 app.use('/user', users);
 app.use(infoapp);
 
-app.use(errorHandler);
+app.use(errorRequestHandler);
 
 const port = config.get('port');
 

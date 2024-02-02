@@ -1,7 +1,6 @@
-import { logger } from '../util';
 const router = require('express').Router();
 import express from 'express';
-import { paramCheck } from '../util';
+import { paramCheck, errorRouteHandler } from '../util';
 import {
   createCommand,
   findCommandByQuery,
@@ -27,12 +26,7 @@ router.post(
       );
       res.status(200).send(id);
     } catch (e) {
-      logger.error(e);
-      if (e instanceof Error) {
-        next(e.message);
-      } else {
-        next(e);
-      }
+      errorRouteHandler(e, next);
     }
   }
 );
@@ -59,12 +53,7 @@ router.get(
       }
       res.status(200).send(commands);
     } catch (e) {
-      logger.error(e);
-      if (e instanceof Error) {
-        next(e.message);
-      } else {
-        next(e);
-      }
+      errorRouteHandler(e, next);
     }
   }
 );
@@ -86,12 +75,7 @@ router.put(
       );
       res.status(200).send(commands);
     } catch (e) {
-      logger.error(e);
-      if (e instanceof Error) {
-        next(e.message);
-      } else {
-        next(e);
-      }
+      errorRouteHandler(e, next);
     }
   }
 );
@@ -108,12 +92,7 @@ router.delete(
       const result = await deleteCommandById(req.params.id, req.params.userId);
       res.status(200).send(result);
     } catch (e) {
-      logger.error(e);
-      if (e instanceof Error) {
-        next(e.message);
-      } else {
-        next(e);
-      }
+      errorRouteHandler(e, next);
     }
   }
 );
