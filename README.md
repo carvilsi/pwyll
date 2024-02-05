@@ -1,7 +1,7 @@
 <div class="text" align="center">
   <img src="https://img.shields.io/github/actions/workflow/status/carvilsi/pwyll/c.yml?logo=github&label=tests" alt="test">
 <p>
-    <img src="https://github.com/carvilsi/pwyll/raw/master/img/pwyll.png" alt="pwyll" >
+    <img src="https://github.com/carvilsi/pwyll/blob/develop/img/pwyll.png" alt="pwyll" >
 </p>
 <p>a simple snippet manager service</p>
 </div>
