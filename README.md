@@ -3,12 +3,13 @@
          ┓┓
   ┏┓┓┏┏┓┏┃┃
   ┣┛┗┻┛┗┫┗┗
-┛     ┛</pre>
+┛     ┛
+a simple snippet manager service
+</pre>
 </div>
 
-<p align="center">
-A simple snippet manager service
-</p>
+<!--<p align="center">-->
+<!--</p>-->
 
 # pwyll 
 
