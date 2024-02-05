@@ -1,9 +1,10 @@
-<!--<div align="center">-->
-<p align="center">       ┓┓</p>
-<p align="center">┏┓┓┏┏┓┏┃┃</p>
-<p align="center">┣┛┗┻┛┗┫┗┗</p>
-<p align="center">┛     ┛  </p>
-<!--</div>-->
+<div class="text" align="center">
+<pre>
+         ┓┓
+  ┏┓┓┏┏┓┏┃┃
+  ┣┛┗┻┛┗┫┗┗
+┛     ┛</pre>
+</div>
 
 <p align="center">
 A simple snippet manager service
