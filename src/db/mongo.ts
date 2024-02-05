@@ -1,4 +1,4 @@
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient } from 'mongodb';
 import config from 'config';
 let mongodb: MongoClient;
 
@@ -13,7 +13,7 @@ export async function connect() {
   mongodb = await client.connect();
 }
 
-export function get() {
+export function getDb(): Db {
   const dbName = String(config.get('mongodb.db'));
   return mongodb.db(dbName);
 }
@@ -26,7 +26,7 @@ export async function getCollection(
   collectionName: string
 ): Promise<Collection> {
   await connect();
-  const db = get();
+  const db = getDb();
   const collection = db.collection(collectionName);
   return collection;
 }

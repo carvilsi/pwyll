@@ -16,6 +16,8 @@ services:
     image: pwyll:1.0.3
     restart: always
     ports:
-    - '46520:46520'
+      - '46520:46520'
+    environment:
+      NODE_ENV: 'production'
     depends_on:
       - mongo
