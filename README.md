@@ -1,9 +1,10 @@
 <div class="text" align="center">
   <img src="https://img.shields.io/github/actions/workflow/status/carvilsi/pwyll/c.yml?logo=github&label=tests" alt="test">
-<p>
-    <img src="https://github.com/carvilsi/pwyll/blob/develop/img/pwyll.png" alt="pwyll" >
-</p>
-<p>a simple snippet manager service</p>
+  <p></p>
+  <p>
+    <img src="https://github.com/carvilsi/pwyll/blob/main/img/pwyll.png" alt="pwyll" >
+  </p>
+  <p>a simple snippet manager service</p>
 </div>
 
 # pwyll 
