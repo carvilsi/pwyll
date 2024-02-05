@@ -1,11 +1,11 @@
 <div class="text" align="center">
-<pre>
+  <pre>
          ┓┓
   ┏┓┓┏┏┓┏┃┃
   ┣┛┗┻┛┗┫┗┗
 ┛     ┛
 a simple snippet manager service
-</pre>
+  </pre>
 </div>
 
 # pwyll 
@@ -20,7 +20,7 @@ Pwyll server needs a MongoDB connection in order to store the snippets.
 
 ### Docker
 
-No doubt about that one of the most useful ways to run is with Docker. There is a Docker volume, so the data will be persisted.
+No doubt about that one of the most useful ways to run it is with Docker. There is a Docker volume, so the data will be persisted.
 
 Build the Docker image for pwyll:
 
