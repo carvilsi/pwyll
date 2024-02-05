@@ -14,7 +14,7 @@ services:
     build:
       context: ./../
       args:
-        NODE_ENV: test
+        NODE_ENV: tests
     restart: always
     ports:
     - '46520:46520'
