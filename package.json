@@ -1,12 +1,12 @@
 {
   "name": "pwyll",
   "version": "1.0.3",
-  "description": "A snippet manager",
+  "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
-    "test-ci-cd": "cd test/; docker-compose down; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 10; ./node_modules/jest/bin/jest.js test/",
+    "test-ci-cd": "cd test/; docker-compose down; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 10; ./node_modules/jest/bin/jest.js --runInBand test/",
     "dev": "cd devops/dev; docker-compose up -d; cd -; nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
-    "dev-test": "cd devops/dev; docker-compose down; docker-compose up -d; cd -; sleep 10; ./node_modules/jest/bin/jest.js test/",
+    "dev-test": "cd devops/dev; docker-compose down; docker-compose up -d; cd -; sleep 10; ./node_modules/jest/bin/jest.js --runInBand test/",
     "build": "tsc",
     "start": "node lib/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts",
