@@ -9,8 +9,7 @@ describe('get the info', () => {
   test('should retieve info', async () => {
     const response = await request(pwyll_machine).get('/');
     expect(response.statusCode).toBe(200);
-    const infoText = response.text;
     const regexp = new RegExp(`${pckg.name}@${pckg.version}`, 'i');
-    expect(regexp.test(infoText)).toBe(true);
+    expect(response.text).toMatch(regexp);
   });
 });

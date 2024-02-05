@@ -25,9 +25,7 @@ describe('users ', () => {
       .send({ username: name })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(/already exists, please choose a different/.test(res.text)).toBe(
-      true
-    );
+    expect(res.text).toMatch(/already exists, please choose a different/);
   });
 
   test('should not allow creating a very long username', async () => {
@@ -36,9 +34,7 @@ describe('users ', () => {
       .send({ username: 'CthulhuTheOneThatSleepsDead' })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(
-      /Username must be not longer than 20 characters/.test(res.text)
-    ).toBe(true);
+    expect(res.text).toMatch(/Username must be not longer than 20 characters/);
   });
 
   test('should not allow creating a user without username', async () => {
@@ -46,9 +42,7 @@ describe('users ', () => {
       .post('/user')
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(/bad request for endpoint, mandatory: username/.test(res.text)).toBe(
-      true
-    );
+    expect(res.text).toMatch(/bad request for endpoint, mandatory: username/);
   });
 
   test('should not allow creating a user with empty username', async () => {
@@ -57,7 +51,7 @@ describe('users ', () => {
       .send({ username: '' })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(/Provide a user name/.test(res.text)).toBe(true);
+    expect(res.text).toMatch(/Provide a user name/);
   });
 
   test('should not allow creating a user with blank username', async () => {
@@ -66,6 +60,6 @@ describe('users ', () => {
       .send({ username: '   ' })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(/Provide a user name/.test(res.text)).toBe(true);
+    expect(res.text).toMatch(/Provide a user name/);
   });
 });
