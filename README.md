@@ -33,7 +33,7 @@ Notice that if you are going to run this in a server with internet connectivity,
 
 ## Testing
 
-Appart from the CI/CD configured for GitHub workflows, you can run the test locally, to do that:
+Apart from the CI/CD configured for GitHub workflows, you can run the test locally, to do that:
 
 - First run the pwyll server with `$ npm run build && npm start`
 - Then run the tests with `$ npm run dev-test` this will start a dockerized MongoDB and will run the tests.
