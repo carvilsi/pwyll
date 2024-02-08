@@ -1,5 +1,5 @@
 import { logger } from './../util';
-import { close, getCollection } from './../db/mongo';
+import { getCollection } from './../db/mongo';
 import { MongoError, ObjectId } from 'mongodb';
 import config from 'config';
 
@@ -23,17 +23,17 @@ export async function createUser(
     if (error instanceof MongoError) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
 export async function findUserById(id: string): Promise<User | undefined> {
   try {
     const collection = await getCollection(collectionName);
+
     logger.debug(`try to find user with id: ${id}`);
     const objectId = new ObjectId(id);
     const result = await collection.findOne({ _id: objectId });
+
     if (result != null) {
       const user: User = {
         username: result.username,
@@ -48,8 +48,6 @@ export async function findUserById(id: string): Promise<User | undefined> {
     if (error instanceof MongoError) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -73,7 +71,5 @@ export async function findUserByName(
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }

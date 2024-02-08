@@ -1,31 +1,30 @@
-import { Collection, Db, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb';
 import config from 'config';
-let mongodb: MongoClient;
 
-export async function connect() {
-  const userDb = config.get('mongodb.user');
-  const passDb = config.get('mongodb.password');
-  const ipDb = config.get('mongodb.ip');
-  const portDb = config.get('mongodb.port');
+const userDb = config.get('mongodb.user');
+const passDb = config.get('mongodb.password');
+const ipDb = config.get('mongodb.ip');
+const portDb = config.get('mongodb.port');
 
-  const url = `mongodb://${userDb}:${passDb}@${ipDb}:${portDb}`;
-  const client = new MongoClient(url);
-  mongodb = await client.connect();
-}
+const url = `mongodb://${userDb}:${passDb}@${ipDb}:${portDb}`;
+
+export const client = new MongoClient(url, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 
 export function getDb(): Db {
   const dbName = String(config.get('mongodb.db'));
-  return mongodb.db(dbName);
-}
-
-export async function close(): Promise<void> {
-  await mongodb.close();
+  return client.db(dbName);
 }
 
 export async function getCollection(
   collectionName: string
 ): Promise<Collection> {
-  await connect();
+  await client.connect();
   const db = getDb();
   const collection = db.collection(collectionName);
   return collection;

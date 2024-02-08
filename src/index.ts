@@ -7,7 +7,9 @@ import { logger, info, errorRequestHandler } from './util/index';
 import commands from './routes/commands';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
-import { connect, getDb, close } from './db/mongo';
+import { getDb } from './db/mongo';
+
+//TODO: what if config user exists but not at db.
 
 // all CORS requests
 const app = express();
@@ -37,7 +39,6 @@ async function main() {
       logger.info('    ┛     ┛  ');
       logger.info('by carvilsi with <3');
       logger.info(`${info.name}@${info.version} running at: ${port}!`);
-      await connect();
       const db = getDb();
       logger.info(
         `connected to MongoDB ${db.databaseName}@${mongoIP}:${mongoPort}`

@@ -1,5 +1,5 @@
 import { logger } from './../util';
-import { close, getCollection } from './../db/mongo';
+import { getCollection } from './../db/mongo';
 import { MongoError, ObjectId } from 'mongodb';
 import config from 'config';
 import { findUserById } from './users_controller';
@@ -15,7 +15,6 @@ export async function createCommand(
 ): Promise<ObjectId | undefined> {
   try {
     const collection = await getCollection(collectionName);
-
     if (userId != null) {
       const user = await findUserById(userId);
       if (user != null) {
@@ -40,8 +39,6 @@ export async function createCommand(
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -96,8 +93,6 @@ export async function findCommandByQuery(
     if (error instanceof MongoError || error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -133,8 +128,6 @@ async function _findCommandById(
         throw new Error(error.message);
       }
     }
-  } finally {
-    await close();
   }
 }
 
@@ -174,8 +167,6 @@ export async function deleteCommandById(
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -228,7 +219,5 @@ export async function updatesCommand(
     if (error instanceof MongoError || error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
