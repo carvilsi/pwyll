@@ -179,10 +179,18 @@ describe('commands CRUD', () => {
 
   test('should not delete a command without valid commandId', async () => {
     const res = await request(pwyll_machine)
-      .delete(`/command/idCommandWrong/${secondUserId}`)
+      .delete(`/command/ccc4e699cd8d0f6588a3bccc/${secondUserId}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Command not found for deleting/);
+  });
+
+  test('should not delete a command with valid commandId but wrong user', async () => {
+    const res = await request(pwyll_machine)
+      .delete(`/command/${idCommandFirstUser}/${secondUserId}`)
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Wrong user provided for deleting command/);
   });
 
   test('should not delete a command without valid userId', async () => {
