@@ -1,5 +1,5 @@
 import { logger } from './../util';
-import { close, getCollection } from './../db/mongo';
+import { getCollection } from './../db/mongo';
 import { MongoError, ObjectId } from 'mongodb';
 import config from 'config';
 import { findUserById } from './users_controller';
@@ -15,9 +15,10 @@ export async function createCommand(
 ): Promise<ObjectId | undefined> {
   try {
     const collection = await getCollection(collectionName);
-
     if (userId != null) {
+      logger.debug(0);
       const user = await findUserById(userId);
+      logger.debug(1);
       if (user != null) {
         const command: Command = {
           command: comm,
@@ -25,8 +26,10 @@ export async function createCommand(
           user: user,
         };
         const insertResult = await collection.insertOne(command);
+        logger.debug(2);
         logger.debug('Inserted documents =>', insertResult);
         const id: ObjectId = insertResult.insertedId;
+        //await close();
         return Promise.resolve(id);
       } else {
         throw new Error(
@@ -40,8 +43,6 @@ export async function createCommand(
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -96,8 +97,6 @@ export async function findCommandByQuery(
     if (error instanceof MongoError || error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -133,8 +132,6 @@ async function _findCommandById(
         throw new Error(error.message);
       }
     }
-  } finally {
-    await close();
   }
 }
 
@@ -174,8 +171,6 @@ export async function deleteCommandById(
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
 
@@ -228,7 +223,5 @@ export async function updatesCommand(
     if (error instanceof MongoError || error instanceof Error) {
       throw new Error(error.message);
     }
-  } finally {
-    await close();
   }
 }
