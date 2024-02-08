@@ -16,9 +16,7 @@ export async function createCommand(
   try {
     const collection = await getCollection(collectionName);
     if (userId != null) {
-      logger.debug(0);
       const user = await findUserById(userId);
-      logger.debug(1);
       if (user != null) {
         const command: Command = {
           command: comm,
@@ -26,10 +24,8 @@ export async function createCommand(
           user: user,
         };
         const insertResult = await collection.insertOne(command);
-        logger.debug(2);
         logger.debug('Inserted documents =>', insertResult);
         const id: ObjectId = insertResult.insertedId;
-        //await close();
         return Promise.resolve(id);
       } else {
         throw new Error(

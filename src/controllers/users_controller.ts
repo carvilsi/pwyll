@@ -28,14 +28,11 @@ export async function createUser(
 
 export async function findUserById(id: string): Promise<User | undefined> {
   try {
-    logger.debug('01');
     const collection = await getCollection(collectionName);
-    logger.debug('02');
 
     logger.debug(`try to find user with id: ${id}`);
     const objectId = new ObjectId(id);
     const result = await collection.findOne({ _id: objectId });
-    logger.debug('03');
 
     if (result != null) {
       const user: User = {
