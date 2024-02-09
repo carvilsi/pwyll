@@ -113,7 +113,7 @@ export async function findCommandById(
       };
       return command;
     } else {
-      return `command not found for ${id}`;
+      throw new Error(`snippet not found for ${id}`);
     }
   } catch (error) {
     logger.error(error);
@@ -123,7 +123,7 @@ export async function findCommandById(
           error.message
         )
       ) {
-        throw new Error('Command not found for deleting');
+        throw new Error(`snippet not found for ${id}`);
       } else {
         throw new Error(error.message);
       }

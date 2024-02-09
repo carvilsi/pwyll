@@ -68,10 +68,13 @@ router.get(
   ) => {
     try {
       paramCheck(req.params, ['id']);
-      const command = await findCommandById(String(req.params.id));
-      command.username = command.user.username;
-      delete command.user;
-      res.status(200).send(command);
+      const command = <Command>await findCommandById(String(req.params.id));
+      const commandToSend: Command = {
+        command: command.command,
+        description: command.description,
+        username: command.user?.username,
+      };
+      res.status(200).send(commandToSend);
     } catch (e) {
       errorRouteHandler(e, next);
     }
