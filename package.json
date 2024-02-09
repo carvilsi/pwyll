@@ -1,6 +1,6 @@
 {
   "name": "pwyll",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "start": "node lib/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts",
     "test": "jest",
-    "release": "tag=$(node -e \"console.log(require('./package.json').version)\"); git tag v${tag}; git push origin v${tag}",
+    "pre-release": "./pre-release.sh",
+    "release": "./git-tag-n-push.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
   },
   "keywords": [],
