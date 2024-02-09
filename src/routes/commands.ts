@@ -97,4 +97,6 @@ router.delete(
   }
 );
 
+// TODO: Add a get command by ID
+
 export default router;

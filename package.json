@@ -11,7 +11,8 @@
     "start": "node lib/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts",
     "test": "jest",
-    "release": "tag=$(node -e \"console.log(require('./package.json').version)\"); git tag v${tag}; git push origin v${tag}",
+    "pre-release": "tag=$(node -e \"console.log(require('./package.json').version)\"); sed -i s/pwyll:[0-9]*.[0-9]*.[0-9]*/pwyll:${tag}/g devops/docker-compose.yml; ./docker-build.sh",
+    "release": "tag=$(node -e \"console.log(require('./package.json').version)\"); git tag v${tag}; git push origin v${tag}; ./docker-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
   },
   "keywords": [],

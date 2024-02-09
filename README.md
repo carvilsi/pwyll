@@ -23,7 +23,7 @@ No doubt about that one of the most useful ways to run it is with Docker. There 
 
 Build the Docker image for pwyll:
 
-`$ ./build.sh`
+`$ ./dokcer-build.sh`
 
 then go to the **devops** directory and run the following command, which will start the pwyll server and MongoDB:
 
