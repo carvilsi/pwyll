@@ -96,7 +96,7 @@ export async function findCommandByQuery(
   }
 }
 
-async function _findCommandById(
+export async function findCommandById(
   id: string
 ): Promise<Command | string | undefined> {
   try {
@@ -111,19 +111,19 @@ async function _findCommandById(
         _id: result._id,
         user: result.user,
       };
-      return Promise.resolve(command);
+      return command;
     } else {
-      return Promise.resolve(`command not found for ${id}`);
+      throw new Error(`snippet not found for ${id}`);
     }
   } catch (error) {
     logger.error(error);
-    if (error instanceof Error) {
+    if (error instanceof MongoError || error instanceof Error) {
       if (
         /Argument passed in must be a string of 12 bytes or a string of 24 hex characters/.test(
           error.message
         )
       ) {
-        throw new Error('Command not found for deleting');
+        throw new Error(`snippet not found for ${id}`);
       } else {
         throw new Error(error.message);
       }
@@ -141,7 +141,7 @@ export async function deleteCommandById(
       const user = await findUserById(userId);
       if (user == null)
         throw new Error('User does not exist for deleting command');
-      const command = await _findCommandById(id);
+      const command = await findCommandById(id);
       if (command != null) {
         if (typeof command === 'string')
           throw new Error('Command not found for deleting command');
@@ -187,7 +187,7 @@ export async function updatesCommand(
       const user = await findUserById(userId);
       if (user == null)
         throw new Error('User does not exist for updating command');
-      const commandFound = await _findCommandById(id);
+      const commandFound = await findCommandById(id);
       if (commandFound != null) {
         if (typeof commandFound === 'string')
           throw new Error('Command not found for updating command');

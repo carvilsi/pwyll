@@ -39,9 +39,9 @@ export async function findUserById(id: string): Promise<User | undefined> {
         username: result.username,
         _id: result._id,
       };
-      return Promise.resolve(user);
+      return user;
     } else {
-      return Promise.resolve(undefined);
+      return undefined;
     }
   } catch (error) {
     logger.error(error);
@@ -62,9 +62,9 @@ export async function findUserByName(
       const user: User = {
         username: result.username,
       };
-      return Promise.resolve(user);
+      return user;
     } else {
-      return Promise.resolve(undefined);
+      return undefined;
     }
   } catch (error) {
     logger.error(error);

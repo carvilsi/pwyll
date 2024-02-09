@@ -4,6 +4,7 @@ import { paramCheck, errorRouteHandler } from '../util';
 import {
   createCommand,
   findCommandByQuery,
+  findCommandById,
   deleteCommandById,
   updatesCommand,
 } from '../controllers/commands_controller';
@@ -58,6 +59,28 @@ router.get(
   }
 );
 
+router.get(
+  '/:id',
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    try {
+      paramCheck(req.params, ['id']);
+      const command = <Command>await findCommandById(String(req.params.id));
+      const commandToSend: Command = {
+        command: command.command,
+        description: command.description,
+        username: command.user?.username,
+      };
+      res.status(200).send(commandToSend);
+    } catch (e) {
+      errorRouteHandler(e, next);
+    }
+  }
+);
+
 router.put(
   '/',
   async (
@@ -96,7 +119,5 @@ router.delete(
     }
   }
 );
-
-// TODO: Add a get command by ID
 
 export default router;

@@ -19,6 +19,10 @@ describe('commands CRUD', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
+  const newCommand =
+    './node_modules/nodemon/bin/nodemon -e js,ts -x ts-node --files src/index.ts';
+  const newDescription =
+    'dev mode nodemon typescript ts-node from node_modules';
 
   test('mock some users', async () => {
     let res = await request(pwyll_machine)
@@ -149,10 +153,6 @@ describe('commands CRUD', () => {
   });
 
   test('should update a command by id and for first user', async () => {
-    const newCommand =
-      './node_modules/nodemon/bin/nodemon -e js,ts -x ts-node --files src/index.ts';
-    const newDescription =
-      'dev mode nodemon typescript ts-node from node_modules';
     let res = await request(pwyll_machine)
       .put('/command')
       .send({
@@ -182,7 +182,7 @@ describe('commands CRUD', () => {
       .delete(`/command/ccc4e699cd8d0f6588a3bccc/${secondUserId}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(res.text).toMatch(/Command not found for deleting/);
+    expect(res.text).toMatch(/snippet not found for/);
   });
 
   test('should not delete a command with valid commandId but wrong user', async () => {
@@ -206,7 +206,7 @@ describe('commands CRUD', () => {
       .delete(`/command/${idCommandSecondUser}/${firstUserId}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(res.text).toMatch(/Command not found for deleting/);
+    expect(res.text).toMatch(/snippet not found for/);
   });
 
   test('should not find a command restricted to invalid user', async () => {
@@ -236,5 +236,23 @@ describe('commands CRUD', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.text).length).toBe(0);
+  });
+
+  test('should retrieve a snippet by snippet ID', async () => {
+    const res = await request(pwyll_machine)
+      .get(`/command/${idCommandFirstUser}`)
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(200);
+    const snippet = JSON.parse(res.text);
+    expect(snippet.command).toBe(newCommand);
+    expect(snippet.description).toBe(newDescription);
+  });
+
+  test('should not retrieve a snippet because snippet ID is not correct', async () => {
+    const res = await request(pwyll_machine)
+      .get('/command/ccc4e699cd8d0f6588a3bccc')
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/snippet not found for/);
   });
 });
