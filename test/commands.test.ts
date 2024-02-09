@@ -237,4 +237,22 @@ describe('commands CRUD', () => {
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.text).length).toBe(0);
   });
+
+  test('should retrieve a snippet by snippet ID', async () => {
+    const res = await request(pwyll_machine)
+      .get(`/command/${idCommandFirstUser}`)
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(200);
+    const snippet = JSON.parse(res.text);
+    expect(snippet.command).toBe(commandObj.command);
+    expect(snippet.description).toBe(commandObj.description);
+  });
+
+  test('should not retrieve a snippet because snippet ID is not correct', async () => {
+    const res = await request(pwyll_machine)
+      .get('/command/ccc4e699cd8d0f6588a3bccc')
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(200);
+    expect(res.text).toMatch(/command not found for/);
+  });
 });
