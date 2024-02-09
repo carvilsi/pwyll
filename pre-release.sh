@@ -6,7 +6,8 @@ NAME=$(node -e "console.log(require('./package.json').name)")
 VERSION=$(node -e "console.log(require('./package.json').version)")
 today=$(date +%Y-%m-%d)
 line="# [v${VERSION}](https:\/\/github.com\/carvilsi\/${NAME}\/releases\/tag\/v${VERSION}) (${today})"
-commit_message=$(git log -1 --format=%s)
+last_release_date=$(head -n 3 CHANGELOG.md | tail -1 | awk '{ print $3 }' | sed 's/(\|)//g')
+commit_message=$(git log --after=${last_release_date} --format='- %s' | grep -v 'Merge')
 
 sed -i "s/pwyll:[0-9]*.[0-9]*.[0-9]*/pwyll:${VERSION}/g" $DCKCMPS
 sed -i '2s/^/\nnewchangelogentry\n/' $CHNGLG

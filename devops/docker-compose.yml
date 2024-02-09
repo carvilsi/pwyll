@@ -13,7 +13,7 @@ services:
       - ./mongo-volume:/data/db
 
   pwyll:
-    image: carvilsi/pwyll:1.0.4
+    image: carvilsi/pwyll:1.1.0
     restart: always
     ports:
       - '46520:46520'

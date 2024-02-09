@@ -1,5 +1,11 @@
 # Changelog
 
+# [v1.1.0](https://github.com/carvilsi/pwyll/releases/tag/v1.1.0) (2024-02-09)
+
+- added endpoint to retrieve snippet by ID
+- improved the pre-release process: adding new CHANGELOG entry with latest commit message
+- improving CI added prepublish on publish the docker image is taged and pushed to dockerhub place 
+
 # [v1.0.4](https://github.com/carvilsi/pwyll/releases/tag/v1.0.4) (2024-02-08)
 
 - Added new test
