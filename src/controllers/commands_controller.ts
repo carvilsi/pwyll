@@ -155,8 +155,7 @@ export async function deleteCommandById(
       const objectId = new ObjectId(id);
       const result = await collection.deleteOne({ _id: objectId });
       if (result != null) {
-        if (result.acknowledged && result.deletedCount === 1)
-          return true;
+        if (result.acknowledged && result.deletedCount === 1) return true;
       } else {
         return false;
       }
@@ -207,8 +206,7 @@ export async function updatesCommand(
         { $set: command },
       ]);
       if (result != null) {
-        if (result.acknowledged && result.matchedCount === 1)
-          return true;
+        if (result.acknowledged && result.matchedCount === 1) return true;
       } else {
         return false;
       }
