@@ -26,7 +26,7 @@ export async function createCommand(
         const insertResult = await collection.insertOne(command);
         logger.debug('Inserted documents =>', insertResult);
         const id: ObjectId = insertResult.insertedId;
-        return Promise.resolve(id);
+        return id;
       } else {
         throw new Error(
           'Not possible to store a command for a non exiting user'
@@ -155,10 +155,9 @@ export async function deleteCommandById(
       const objectId = new ObjectId(id);
       const result = await collection.deleteOne({ _id: objectId });
       if (result != null) {
-        if (result.acknowledged && result.deletedCount === 1)
-          return Promise.resolve(true);
+        if (result.acknowledged && result.deletedCount === 1) return true;
       } else {
-        return Promise.resolve(false);
+        return false;
       }
     } else {
       throw new Error('bad request');
@@ -207,10 +206,9 @@ export async function updatesCommand(
         { $set: command },
       ]);
       if (result != null) {
-        if (result.acknowledged && result.matchedCount === 1)
-          return Promise.resolve(true);
+        if (result.acknowledged && result.matchedCount === 1) return true;
       } else {
-        return Promise.resolve(false);
+        return false;
       }
     } else {
       throw new Error('bad request');
