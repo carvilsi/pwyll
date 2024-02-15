@@ -1,5 +1,14 @@
 # Changelog
 
+# [v1.1.1](https://github.com/carvilsi/pwyll/releases/tag/v1.1.1) (2024-02-15)
+
+- adding audit npm on pre-release
+- updating ip dependent due a high vulnerability
+- small refactor about promises
+- fixing git tagging script
+- run workflow test when pushing to develop branch
+- improved pre-release script
+
 # [v1.1.0](https://github.com/carvilsi/pwyll/releases/tag/v1.1.0) (2024-02-09)
 
 - added endpoint to retrieve snippet by ID
