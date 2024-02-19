@@ -6,7 +6,7 @@ import {
   findCommandByQuery,
   findCommandById,
   deleteCommandById,
-  updatesCommand,
+  updateCommand,
 } from '../controllers/commands_controller';
 
 // adds a command
@@ -19,11 +19,12 @@ router.post(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['command', 'description', 'userId']);
+      paramCheck(req.body, ['command', 'description', 'userId', 'secret']);
       const id = await createCommand(
         req.body.command,
         req.body.description,
-        req.body.userId
+        req.body.userId,
+        req.body.secret
       );
       res.status(200).send(id);
     } catch (e) {
@@ -59,6 +60,7 @@ router.get(
   }
 );
 
+// retrieves a snippet by ID
 router.get(
   '/:id',
   async (
@@ -81,6 +83,7 @@ router.get(
   }
 );
 
+// updates a snippet from a user
 router.put(
   '/',
   async (
@@ -89,12 +92,13 @@ router.put(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['command', 'description', 'id', 'userId']);
-      const commands = await updatesCommand(
+      paramCheck(req.body, ['command', 'description', 'id', 'userId', 'secret']);
+      const commands = await updateCommand(
         req.body.command,
         req.body.description,
         req.body.id,
-        req.body.userId
+        req.body.userId,
+        req.body.secret
       );
       res.status(200).send(commands);
     } catch (e) {
@@ -103,6 +107,7 @@ router.put(
   }
 );
 
+// deletes a snippet from a user
 router.delete(
   '/:id/:userId',
   async (
@@ -111,8 +116,12 @@ router.delete(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.params, ['id', 'userId']);
-      const result = await deleteCommandById(req.params.id, req.params.userId);
+      paramCheck(req.params, ['id', 'userId', 'secret']);
+      const result = await deleteCommandById(
+        req.params.id, 
+        req.params.userId, 
+        req.params.secret 
+      );
       res.status(200).send(result);
     } catch (e) {
       errorRouteHandler(e, next);

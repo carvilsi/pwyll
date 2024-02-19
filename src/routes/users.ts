@@ -4,6 +4,7 @@ import express from 'express';
 import {
   paramCheck,
   userLengthCheck,
+  secretLengthCheck,
   userExistenceCheck,
   errorRouteHandler,
 } from '../util';
@@ -18,11 +19,13 @@ router.post(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['username']);
+      paramCheck(req.body, ['username', 'secret']);
       const username = req.body.username;
+      const secret = req.body.secret;
       userLengthCheck(username);
+      secretLengthCheck(secret);
       await userExistenceCheck(username);
-      const id = await createUser(req.body.username);
+      const id = await createUser(username, secret);
       res.status(200).send(id);
     } catch (e) {
       errorRouteHandler(e, next);

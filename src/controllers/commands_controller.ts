@@ -9,32 +9,23 @@ const collectionName = String(config.get('mongodb.collections.commands'));
 const limitFind = Number(config.get('mongodb.limit'));
 
 export async function createCommand(
-  comm: string,
+  snippet: string,
   description: string,
-  userId: string
+  userId: string,
+  secret: string
 ): Promise<ObjectId | undefined> {
   try {
     const collection = await getCollection(collectionName);
-    if (userId != null) {
-      const user = await findUserById(userId);
-      if (user != null) {
-        const command: Command = {
-          command: comm,
-          description: description,
-          user: user,
-        };
-        const insertResult = await collection.insertOne(command);
-        logger.debug('Inserted documents =>', insertResult);
-        const id: ObjectId = insertResult.insertedId;
-        return id;
-      } else {
-        throw new Error(
-          'Not possible to store a command for a non exiting user'
-        );
-      }
-    } else {
-      throw new Error('userId must be provided');
-    }
+    const user = await findUserById(userId, secret);
+    const command: Command = {
+      command: snippet,
+      description: description,
+      user: user,
+    };
+    const insertResult = await collection.insertOne(command);
+    logger.debug('Inserted documents =>', insertResult);
+    const id: ObjectId = insertResult.insertedId;
+    return id;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -44,7 +35,7 @@ export async function createCommand(
 
 export async function findCommandByQuery(
   search: string,
-  userId?: string
+  userId?: string,
 ): Promise<Command[] | undefined> {
   try {
     const collection = await getCollection(collectionName);
@@ -133,12 +124,13 @@ export async function findCommandById(
 
 export async function deleteCommandById(
   id: string,
-  userId: string
+  userId: string,
+  secret: string
 ): Promise<boolean | undefined> {
   try {
     const collection = await getCollection(collectionName);
     if (id != null && userId != null) {
-      const user = await findUserById(userId);
+      const user = await findUserById(userId, secret);
       if (user == null)
         throw new Error('User does not exist for deleting command');
       const command = await findCommandById(id);
@@ -169,11 +161,12 @@ export async function deleteCommandById(
   }
 }
 
-export async function updatesCommand(
+export async function updateCommand(
   commandUpdate: string,
   descriptionUpdate: string,
   id: string,
-  userId: string
+  userId: string,
+  secret: string
 ): Promise<boolean | undefined> {
   try {
     const collection = await getCollection(collectionName);
@@ -183,7 +176,7 @@ export async function updatesCommand(
       commandUpdate != null &&
       descriptionUpdate != null
     ) {
-      const user = await findUserById(userId);
+      const user = await findUserById(userId, secret);
       if (user == null)
         throw new Error('User does not exist for updating command');
       const commandFound = await findCommandById(id);

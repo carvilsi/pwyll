@@ -19,6 +19,8 @@ describe('commands CRUD', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
+  const firstUserSecret = 'the secret for first user';
+  const secondUserSecret = 'the secret for second user';
   const newCommand =
     './node_modules/nodemon/bin/nodemon -e js,ts -x ts-node --files src/index.ts';
   const newDescription =
@@ -27,7 +29,10 @@ describe('commands CRUD', () => {
   test('mock some users', async () => {
     let res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: firstUser })
+      .send({ 
+        username: firstUser,
+        secret: firstUserSecret
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
@@ -35,7 +40,10 @@ describe('commands CRUD', () => {
     commandObj.userId = firstUserId;
     res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: secondtUser })
+      .send({ 
+        username: secondtUser,
+        secret: secondUserSecret
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
@@ -76,9 +84,7 @@ describe('commands CRUD', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
-    expect(res.text).toMatch(
-      /Not possible to store a command for a non exiting user/
-    );
+    expect(res.text).toMatch(/Invalid userID or secret/);
   });
 
   test('should not create a command if user is not provided', async () => {

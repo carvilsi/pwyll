@@ -5,6 +5,7 @@ export const info = require('./../../package.json');
 import config from 'config';
 import { findUserByName } from '../controllers/users_controller';
 import express from 'express';
+import { createHash } from 'node:crypto';
 
 const logLevel = config.get('logLevel');
 
@@ -27,6 +28,11 @@ export function userLengthCheck(username: string): boolean {
   if (!username.trim().length) throw 'Provide a user name';
   if (username.length > 20)
     throw 'Username must be not longer than 20 characters';
+  return true;
+}
+
+export function secretLengthCheck(secret: string): boolean {
+  if (!secret.trim().length) throw 'Provide a secret';
   return true;
 }
 
@@ -55,4 +61,10 @@ export function errorRouteHandler(err: unknown, next: express.NextFunction) {
   } else {
     next(err);
   }
+}
+
+export function getHash(secret: string): string {
+  const hash = createHash('sha256');
+  hash.update(secret);
+  return hash.digest('hex');
 }

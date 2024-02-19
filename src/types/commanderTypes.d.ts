@@ -9,4 +9,10 @@ type Command = {
 type User = {
   username: string;
   _id?: ObjectId;
+  secret?: string;
 };
+
+type QueryUser = {
+  _id: ObjectId;
+  secret?: string;
+}

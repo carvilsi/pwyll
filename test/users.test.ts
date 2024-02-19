@@ -13,16 +13,31 @@ describe('users ', () => {
   test('should create a user', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: name })
+      .send({ 
+        username: name,
+        secret: 'my secret'
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
   });
 
-  test('should not allow creating an existing user', async () => {
+  test('should not allow creating a user if secret is not provided', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
       .send({ username: name })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/bad request for endpoint, mandatory: secret/);
+  });
+
+  test('should not allow creating an existing user', async () => {
+    const res = await request(pwyll_machine)
+      .post('/user')
+      .send({ 
+        username: name,
+        secret: 'my secret' 
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/already exists, please choose a different/);
@@ -31,7 +46,10 @@ describe('users ', () => {
   test('should not allow creating a very long username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: 'CthulhuTheOneThatSleepsDead' })
+      .send({ 
+        username: 'CthulhuTheOneThatSleepsDead',
+        secret: 'my secret' 
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Username must be not longer than 20 characters/);
@@ -48,7 +66,10 @@ describe('users ', () => {
   test('should not allow creating a user with empty username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: '' })
+      .send({ 
+        username: '',
+        secret: 'my secret' 
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a user name/);
@@ -57,9 +78,36 @@ describe('users ', () => {
   test('should not allow creating a user with blank username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ username: '   ' })
+      .send({ 
+        username: '   ',
+        secret: 'my secret'
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a user name/);
+  });
+
+  test('should not allow creating a user with empty secret', async () => {
+    const res = await request(pwyll_machine)
+      .post('/user')
+      .send({ 
+        username: 'aragorn',
+        secret: '' 
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Provide a secret/);
+  });
+
+  test('should not allow creating a user with blank secret', async () => {
+    const res = await request(pwyll_machine)
+      .post('/user')
+      .send({ 
+        username: 'gandalf',
+        secret: '     '
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Provide a secret/);
   });
 });
