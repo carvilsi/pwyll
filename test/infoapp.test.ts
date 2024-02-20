@@ -15,8 +15,8 @@ describe('get the info', () => {
 
   test('should retieve info object', async () => {
     const res = await request(pwyll_machine)
-    .get('/info')
-    .set('Accept', 'application/json');
+      .get('/info')
+      .set('Accept', 'application/json');
     const response = JSON.parse(res.text);
     expect(res.statusCode).toBe(200);
     expect(response.version).toBe(pckg.version);

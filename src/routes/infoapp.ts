@@ -13,7 +13,7 @@ router.get('/info', (req: express.Request, res: express.Response) => {
   const pwyllInfo: Info = {
     version: info.version,
     name: info.name,
-  }
+  };
   res.status(200).send(pwyllInfo);
 });
 

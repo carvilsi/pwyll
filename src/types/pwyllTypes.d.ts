@@ -20,4 +20,4 @@ type QueryUser = {
 type Info = {
   version: string;
   name: string;
-}
+};
