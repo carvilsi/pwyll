@@ -3,8 +3,9 @@ import config from 'config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
-import { logger, info, errorRequestHandler } from './util/index';
-import commands from './routes/commands';
+import { logger, info } from './util/index';
+import { errorRequestHandler } from './errorHandlers';
+import snippets from './routes/snippets';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
 import { getDb } from './db/mongo';
@@ -20,7 +21,7 @@ const http = require('http').createServer(app);
 app.use(express.json());
 
 // endpoints
-app.use('/command', commands);
+app.use('/snippet', snippets);
 app.use('/user', users);
 app.use(infoapp);
 

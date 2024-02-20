@@ -1,5 +1,5 @@
-type Command = {
-  command: string;
+type Snippet = {
+  snippet: string;
   description: string;
   _id?: ObjectId;
   user?: User;
@@ -9,4 +9,10 @@ type Command = {
 type User = {
   username: string;
   _id?: ObjectId;
+  secret?: string;
+};
+
+type QueryUser = {
+  _id: ObjectId;
+  secret?: string;
 };

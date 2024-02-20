@@ -8,7 +8,7 @@ module.exports = {
     port: 27017,
     db: 'pwyll',
     collections: {
-      commands: 'commands',
+      snippets: 'snippets',
       users: 'users',
     },
     limit: 5,

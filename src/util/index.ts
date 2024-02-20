@@ -1,23 +1,36 @@
-const Logger = require('logplease');
-
-export const info = require('./../../package.json');
-
-import config from 'config';
 import { findUserByName } from '../controllers/users_controller';
 import express from 'express';
+import { createHash } from 'node:crypto';
 
+const Logger = require('logplease');
+export const info = require('./../../package.json');
+import config from 'config';
 const logLevel = config.get('logLevel');
-
 Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
+// check if the mandatory parameters are comming
+// from request depending on check value:
+// body (default), params, query
 export function paramCheck(
-  param: any,
-  mandatoryParams: Array<string>
+  req: express.Request,
+  mandatoryParams: Array<string>,
+  { check = 'body' }: { check?: string } = {}
 ): boolean {
   for (const mandatoryParam of mandatoryParams) {
-    if (param[mandatoryParam] == null) {
-      throw `bad request for endpoint, mandatory: ${mandatoryParam}`;
+    const errMessage = `bad request for endpoint, mandatory: ${mandatoryParam}`;
+    switch (check) {
+      case 'body':
+        if (req.body[mandatoryParam] == null) throw errMessage;
+        break;
+      case 'params':
+        if (req.params[mandatoryParam] == null) throw errMessage;
+        break;
+      case 'query':
+        if (req.query[mandatoryParam] == null) throw errMessage;
+        break;
+      default:
+        break;
     }
   }
   return true;
@@ -30,6 +43,11 @@ export function userLengthCheck(username: string): boolean {
   return true;
 }
 
+export function secretLengthCheck(secret: string): boolean {
+  if (!secret.trim().length) throw 'Provide a secret';
+  return true;
+}
+
 export async function userExistenceCheck(username: string): Promise<boolean> {
   const user = await findUserByName(username);
   if (user != null)
@@ -37,22 +55,8 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
   return true;
 }
 
-export function errorRequestHandler(
-  err: express.ErrorRequestHandler,
-  req: express.Request,
-  res: express.Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: express.NextFunction
-) {
-  res.status(500);
-  res.send({ message: err });
-}
-
-export function errorRouteHandler(err: unknown, next: express.NextFunction) {
-  logger.error(err);
-  if (err instanceof Error) {
-    next(err.message);
-  } else {
-    next(err);
-  }
+export function getHash(secret: string): string {
+  const hash = createHash('sha256');
+  hash.update(secret);
+  return hash.digest('hex');
 }
