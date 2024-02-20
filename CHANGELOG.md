@@ -1,5 +1,15 @@
 # Changelog
 
+# [v2.0.0](https://github.com/carvilsi/pwyll/releases/tag/v2.0.0) (2024-02-20)
+
+- fixing linting thing
+- adding info endpoint to retrieve object with version and name
+- adding test for info endpoint
+- implemted user secret 
+- improved error handling 
+- added linter to tests 
+- added more tests
+
 # [v1.1.1](https://github.com/carvilsi/pwyll/releases/tag/v1.1.1) (2024-02-15)
 
 - adding audit npm on pre-release
