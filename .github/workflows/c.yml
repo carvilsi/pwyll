@@ -23,5 +23,7 @@ jobs:
     - name: testing
       working-directory: .
       run: npm run test-ci-cd
-    - name: linter
+    - name: linter source 
       run: npm run lint
+    - name: linter tests
+      run: npm run lint-test
