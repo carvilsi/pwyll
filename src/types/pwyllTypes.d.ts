@@ -16,3 +16,8 @@ type QueryUser = {
   _id: ObjectId;
   secret?: string;
 };
+
+type Info = {
+  version: string;
+  name: string;
+}
