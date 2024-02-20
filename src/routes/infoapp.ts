@@ -8,4 +8,13 @@ router.get('/', (req: express.Request, res: express.Response) => {
   res.status(200).send(`${info.name}@${info.version} by carvilsi with <3`);
 });
 
+router.get('/info', (req: express.Request, res: express.Response) => {
+  logger.debug('retrieved call to /version endpoit');
+  const pwyllInfo: Info = {
+    version: info.version,
+    name: info.name,
+  };
+  res.status(200).send(pwyllInfo);
+});
+
 export default router;
