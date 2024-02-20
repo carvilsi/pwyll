@@ -13,12 +13,24 @@ Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
 export function paramCheck(
-  param: any,
-  mandatoryParams: Array<string>
+  req: express.Request,
+  mandatoryParams: Array<string>,
+  { check = 'body' }: { check?: string } = {}
 ): boolean {
   for (const mandatoryParam of mandatoryParams) {
-    if (param[mandatoryParam] == null) {
-      throw `bad request for endpoint, mandatory: ${mandatoryParam}`;
+    const errMessage = `bad request for endpoint, mandatory: ${mandatoryParam}`;
+    switch (check) {
+      case 'body':
+        if (req.body[mandatoryParam] == null) throw errMessage;
+        break;
+      case 'params':
+        if (req.params[mandatoryParam] == null) throw errMessage;
+        break;
+      case 'query':
+        if (req.query[mandatoryParam] == null) throw errMessage;
+        break;
+      default:
+        break;
     }
   }
   return true;

@@ -19,7 +19,7 @@ router.post(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['command', 'description', 'userId', 'secret']);
+      paramCheck(req, ['command', 'description', 'userId', 'secret']);
       const id = await createCommand(
         req.body.command,
         req.body.description,
@@ -43,7 +43,7 @@ router.get(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.query, ['q']);
+      paramCheck(req, ['q'], { check: 'query' });
       let commands;
       if (req.query.userId != null) {
         commands = await findCommandByQuery(
@@ -69,7 +69,7 @@ router.get(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.params, ['id']);
+      paramCheck(req, ['id'], { check: 'params' });
       const command = <Command>await findCommandById(String(req.params.id));
       const commandToSend: Command = {
         command: command.command,
@@ -92,7 +92,7 @@ router.put(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['command', 'description', 'id', 'userId', 'secret']);
+      paramCheck(req, ['command', 'description', 'id', 'userId', 'secret']);
       const commands = await updateCommand(
         req.body.command,
         req.body.description,
@@ -116,11 +116,11 @@ router.delete(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.params, ['id', 'userId', 'secret']);
+      paramCheck(req, ['id', 'userId', 'secret'], { check: 'params' });
       const result = await deleteCommandById(
-        req.params.id, 
-        req.params.userId, 
-        req.params.secret 
+        req.params.id,
+        req.params.userId,
+        req.params.secret
       );
       res.status(200).send(result);
     } catch (e) {

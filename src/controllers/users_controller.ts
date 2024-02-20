@@ -29,7 +29,7 @@ export async function createUser(
 }
 
 export async function findUserById(
-  id: string, 
+  id: string,
   secret?: string
 ): Promise<User | undefined> {
   try {
@@ -38,7 +38,7 @@ export async function findUserById(
     logger.debug(`try to find user with id: ${id}`);
     const objectId = new ObjectId(id);
     const userQuery: QueryUser = {
-      _id: objectId 
+      _id: objectId,
     };
     if (typeof secret !== 'undefined') userQuery.secret = getHash(secret);
     const result = await collection.findOne(userQuery);

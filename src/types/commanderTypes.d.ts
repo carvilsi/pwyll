@@ -15,4 +15,4 @@ type User = {
 type QueryUser = {
   _id: ObjectId;
   secret?: string;
-}
+};

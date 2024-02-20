@@ -35,7 +35,7 @@ export async function createCommand(
 
 export async function findCommandByQuery(
   search: string,
-  userId?: string,
+  userId?: string
 ): Promise<Command[] | undefined> {
   try {
     const collection = await getCollection(collectionName);

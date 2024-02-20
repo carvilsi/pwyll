@@ -19,7 +19,7 @@ router.post(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req.body, ['username', 'secret']);
+      paramCheck(req, ['username', 'secret']);
       const username = req.body.username;
       const secret = req.body.secret;
       userLengthCheck(username);
