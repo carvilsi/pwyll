@@ -1,5 +1,5 @@
-type Command = {
-  command: string;
+type Snippet = {
+  snippet: string;
   description: string;
   _id?: ObjectId;
   user?: User;

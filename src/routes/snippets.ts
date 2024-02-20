@@ -1,15 +1,16 @@
 const router = require('express').Router();
 import express from 'express';
-import { paramCheck, errorRouteHandler } from '../util';
+import { paramCheck } from '../util';
+import { errorRouteHandler } from '../errorHandlers';
 import {
-  createCommand,
-  findCommandByQuery,
-  findCommandById,
-  deleteCommandById,
-  updateCommand,
-} from '../controllers/commands_controller';
+  createSnippet,
+  findSnippetByQuery,
+  findSnippetByID,
+  deleteSnippetByID,
+  updateSnippet,
+} from '../controllers/snippets_controller';
 
-// adds a command
+// adds a snippet
 // If does not comes with user id will be not possible to do RUD
 router.post(
   '/',
@@ -19,11 +20,11 @@ router.post(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req, ['command', 'description', 'userId', 'secret']);
-      const id = await createCommand(
-        req.body.command,
+      paramCheck(req, ['snippet', 'description', 'userID', 'secret']);
+      const id = await createSnippet(
+        req.body.snippet,
         req.body.description,
-        req.body.userId,
+        req.body.userID,
         req.body.secret
       );
       res.status(200).send(id);
@@ -33,8 +34,8 @@ router.post(
   }
 );
 
-// finds a command by query on command or description
-// if userId is provided, then it will restrict the search for this user
+// finds a snippet by query on command or description
+// if userID is provided, then it will restrict the search for this user
 router.get(
   '/find',
   async (
@@ -44,16 +45,16 @@ router.get(
   ) => {
     try {
       paramCheck(req, ['q'], { check: 'query' });
-      let commands;
-      if (req.query.userId != null) {
-        commands = await findCommandByQuery(
+      let snippets;
+      if (req.query.userID != null) {
+        snippets = await findSnippetByQuery(
           String(req.query.q),
-          String(req.query.userId)
+          String(req.query.userID)
         );
       } else {
-        commands = await findCommandByQuery(String(req.query.q));
+        snippets = await findSnippetByQuery(String(req.query.q));
       }
-      res.status(200).send(commands);
+      res.status(200).send(snippets);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -70,13 +71,15 @@ router.get(
   ) => {
     try {
       paramCheck(req, ['id'], { check: 'params' });
-      const command = <Command>await findCommandById(String(req.params.id));
-      const commandToSend: Command = {
-        command: command.command,
-        description: command.description,
-        username: command.user?.username,
+      const foundSnippet = <Snippet>(
+        await findSnippetByID(String(req.params.id))
+      );
+      const snippetToSend: Snippet = {
+        snippet: foundSnippet.snippet,
+        description: foundSnippet.description,
+        username: foundSnippet.user?.username,
       };
-      res.status(200).send(commandToSend);
+      res.status(200).send(snippetToSend);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -92,15 +95,15 @@ router.put(
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req, ['command', 'description', 'id', 'userId', 'secret']);
-      const commands = await updateCommand(
-        req.body.command,
+      paramCheck(req, ['snippet', 'description', 'id', 'userID', 'secret']);
+      const snippet = await updateSnippet(
+        req.body.snippet,
         req.body.description,
         req.body.id,
-        req.body.userId,
+        req.body.userID,
         req.body.secret
       );
-      res.status(200).send(commands);
+      res.status(200).send(snippet);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -109,17 +112,17 @@ router.put(
 
 // deletes a snippet from a user
 router.delete(
-  '/:id/:userId',
+  '/:id/:userID/:secret',
   async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) => {
     try {
-      paramCheck(req, ['id', 'userId', 'secret'], { check: 'params' });
-      const result = await deleteCommandById(
+      paramCheck(req, ['id', 'userID', 'secret'], { check: 'params' });
+      const result = await deleteSnippetByID(
         req.params.id,
-        req.params.userId,
+        req.params.userID,
         req.params.secret
       );
       res.status(200).send(result);

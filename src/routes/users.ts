@@ -6,8 +6,8 @@ import {
   userLengthCheck,
   secretLengthCheck,
   userExistenceCheck,
-  errorRouteHandler,
 } from '../util';
+import { errorRouteHandler } from '../errorHandlers';
 import { createUser } from '../controllers/users_controller';
 
 // adds a user

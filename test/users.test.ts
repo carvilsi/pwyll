@@ -13,9 +13,9 @@ describe('users ', () => {
   test('should create a user', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: name,
-        secret: 'my secret'
+        secret: 'my secret',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
@@ -34,9 +34,9 @@ describe('users ', () => {
   test('should not allow creating an existing user', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: name,
-        secret: 'my secret' 
+        secret: 'my secret',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -46,9 +46,9 @@ describe('users ', () => {
   test('should not allow creating a very long username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: 'CthulhuTheOneThatSleepsDead',
-        secret: 'my secret' 
+        secret: 'my secret',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -66,9 +66,9 @@ describe('users ', () => {
   test('should not allow creating a user with empty username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: '',
-        secret: 'my secret' 
+        secret: 'my secret',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -78,9 +78,9 @@ describe('users ', () => {
   test('should not allow creating a user with blank username', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: '   ',
-        secret: 'my secret'
+        secret: 'my secret',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -90,9 +90,9 @@ describe('users ', () => {
   test('should not allow creating a user with empty secret', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: 'aragorn',
-        secret: '' 
+        secret: '',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -102,9 +102,9 @@ describe('users ', () => {
   test('should not allow creating a user with blank secret', async () => {
     const res = await request(pwyll_machine)
       .post('/user')
-      .send({ 
+      .send({
         username: 'gandalf',
-        secret: '     '
+        secret: '     ',
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);

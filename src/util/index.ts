@@ -1,17 +1,17 @@
-const Logger = require('logplease');
-
-export const info = require('./../../package.json');
-
-import config from 'config';
 import { findUserByName } from '../controllers/users_controller';
 import express from 'express';
 import { createHash } from 'node:crypto';
 
+const Logger = require('logplease');
+export const info = require('./../../package.json');
+import config from 'config';
 const logLevel = config.get('logLevel');
-
 Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
+// check if the mandatory parameters are comming
+// from request depending on check value:
+// body (default), params, query
 export function paramCheck(
   req: express.Request,
   mandatoryParams: Array<string>,
@@ -53,26 +53,6 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
   if (user != null)
     throw `User ${username} already exists, please choose a different one`;
   return true;
-}
-
-export function errorRequestHandler(
-  err: express.ErrorRequestHandler,
-  req: express.Request,
-  res: express.Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  next: express.NextFunction
-) {
-  res.status(500);
-  res.send({ message: err });
-}
-
-export function errorRouteHandler(err: unknown, next: express.NextFunction) {
-  logger.error(err);
-  if (err instanceof Error) {
-    next(err.message);
-  } else {
-    next(err);
-  }
 }
 
 export function getHash(secret: string): string {

@@ -1,7 +1,8 @@
 import { logger, getHash } from './../util';
 import { getCollection } from './../db/mongo';
-import { MongoError, ObjectId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import config from 'config';
+import { UserIdentityError, errorControllerHandler } from '../errorHandlers';
 
 const collectionName = String(config.get('mongodb.collections.users'));
 
@@ -22,21 +23,19 @@ export async function createUser(
     const id: ObjectId = insertResult.insertedId;
     return id;
   } catch (error) {
-    if (error instanceof MongoError) {
-      throw new Error(error.message);
-    }
+    errorControllerHandler(error);
   }
 }
 
-export async function findUserById(
-  id: string,
+export async function findUserByID(
+  userID: string,
   secret?: string
 ): Promise<User | undefined> {
   try {
     const collection = await getCollection(collectionName);
 
-    logger.debug(`try to find user with id: ${id}`);
-    const objectId = new ObjectId(id);
+    logger.debug(`try to find user with id: ${userID}`);
+    const objectId = new ObjectId(userID);
     const userQuery: QueryUser = {
       _id: objectId,
     };
@@ -50,16 +49,10 @@ export async function findUserById(
       };
       return user;
     } else {
-      throw new Error('Invalid userID or secret');
+      throw new UserIdentityError('Invalid userID or secret');
     }
   } catch (error) {
-    logger.error(error);
-    if (error instanceof MongoError) {
-      throw new Error(error.message);
-      // TODO: I do not like this! create a type of error!
-    } else if (error instanceof Error) {
-      throw new Error(error.message);
-    }
+    errorControllerHandler(error);
   }
 }
 
@@ -79,9 +72,6 @@ export async function findUserByName(
       return undefined;
     }
   } catch (error) {
-    logger.error(error);
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
+    errorControllerHandler(error);
   }
 }
