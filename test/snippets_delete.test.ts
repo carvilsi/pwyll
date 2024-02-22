@@ -7,8 +7,8 @@ import request from 'supertest';
 import testGlobals from './test_globals';
 
 describe('snippets delete', () => {
-  let idCommandFirstUser: string;
-  let idCommandSecondUser: string;
+  let firstUserSnippetID: string;
+  let secondUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
@@ -48,7 +48,7 @@ describe('snippets delete', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandFirstUser = JSON.parse(res.text);
+    firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
@@ -60,13 +60,13 @@ describe('snippets delete', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandSecondUser = JSON.parse(res.text);
+    secondUserSnippetID = JSON.parse(res.text);
   });
 
   test('should delete a snippet by id and for second user', async () => {
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
-        `/snippet/${idCommandSecondUser}/${secondUserID}/${secondUserSecret}`
+        `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
@@ -74,10 +74,10 @@ describe('snippets delete', () => {
     expect(response).toBe(true);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .get('/snippet/find')
-      .query({ 
+      .query({
         q: 'nodemon',
-        userID: secondUserID, 
-    })
+        userID: secondUserID,
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     response = JSON.parse(res.text);
@@ -86,9 +86,7 @@ describe('snippets delete', () => {
 
   test('should not delete a snippet without existing snippetID', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .delete(
-        `/snippet/${fakeSnippetID}/${secondUserID}/${secondUserSecret}`
-      )
+      .delete(`/snippet/${fakeSnippetID}/${secondUserID}/${secondUserSecret}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/snippet not found for/);
@@ -107,7 +105,7 @@ describe('snippets delete', () => {
   test('should not delete a snippet with valid snippetID but wrong user', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
-        `/snippet/${idCommandFirstUser}/${secondUserID}/${secondUserSecret}`
+        `/snippet/${firstUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -117,7 +115,7 @@ describe('snippets delete', () => {
   test('should not delete a snippet without existing userID', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
-        `/snippet/${idCommandSecondUser}/${fakeSnippetID}/${secondUserSecret}`
+        `/snippet/${secondUserSnippetID}/${fakeSnippetID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -127,7 +125,7 @@ describe('snippets delete', () => {
   test('should not delete a snippet without valid userID', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
-        `/snippet/${idCommandSecondUser}/secondUserIdWrong/${secondUserSecret}`
+        `/snippet/${secondUserSnippetID}/secondUserIdWrong/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -137,7 +135,7 @@ describe('snippets delete', () => {
   test('should not delete a snippet with valid snippetID but userID from another user', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
-        `/snippet/${idCommandSecondUser}/${firstUserID}/${secondUserSecret}`
+        `/snippet/${secondUserSnippetID}/${firstUserID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);

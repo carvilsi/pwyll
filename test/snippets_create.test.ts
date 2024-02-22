@@ -7,8 +7,6 @@ import testGlobals from './test_globals';
 import request from 'supertest';
 
 describe('snippets create', () => {
-  let idCommandFirstUser: string;
-  let idCommandSecondUser: string;
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
@@ -50,7 +48,6 @@ describe('snippets create', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandFirstUser = JSON.parse(res.text);
   });
 
   test('should create another snippet for second user', async () => {
@@ -65,7 +62,6 @@ describe('snippets create', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandSecondUser = JSON.parse(res.text);
   });
 
   test('should not create a snippet if provided user does not exists', async () => {
@@ -147,5 +143,4 @@ describe('snippets create', () => {
       /bad request for endpoint, mandatory: description/
     );
   });
-
 });

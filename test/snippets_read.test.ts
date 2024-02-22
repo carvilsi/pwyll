@@ -7,7 +7,7 @@ import request from 'supertest';
 import testGlobals from './test_globals';
 
 describe('snippets read (find)', () => {
-  let idCommandFirstUser: string;
+  let firstUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
@@ -47,7 +47,7 @@ describe('snippets read (find)', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandFirstUser = JSON.parse(res.text);
+    firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
@@ -130,7 +130,7 @@ describe('snippets read (find)', () => {
 
   test('should retrieve a snippet by snippet ID', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .get(`/snippet/${idCommandFirstUser}`)
+      .get(`/snippet/${firstUserSnippetID}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     const foundCommand = JSON.parse(res.text);

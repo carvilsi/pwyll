@@ -7,8 +7,7 @@ import request from 'supertest';
 import testGlobals from './test_globals';
 
 describe('snippets CRUD', () => {
-  let idCommandFirstUser: string;
-  let idCommandSecondUser: string;
+  let firstUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
@@ -50,7 +49,7 @@ describe('snippets CRUD', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandFirstUser = JSON.parse(res.text);
+    firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
@@ -62,7 +61,6 @@ describe('snippets CRUD', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    idCommandSecondUser = JSON.parse(res.text);
   });
 
   test('should update a snippet by id and for first user', async () => {
@@ -72,7 +70,7 @@ describe('snippets CRUD', () => {
         snippet: newCommand,
         description: newDescription,
         userID: firstUserID,
-        id: idCommandFirstUser,
+        id: firstUserSnippetID,
         secret: firstUserSecret,
       })
       .set('Accept', 'application/json');
@@ -80,7 +78,7 @@ describe('snippets CRUD', () => {
     let response = JSON.parse(res.text);
     expect(response).toBe(true);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .get(`/snippet/${idCommandFirstUser}`)
+      .get(`/snippet/${firstUserSnippetID}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     response = JSON.parse(res.text);
@@ -89,4 +87,63 @@ describe('snippets CRUD', () => {
     expect(response.username).toBe(firstUser);
   });
 
+  test('should not update a snippet for other user', async () => {
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
+      .put('/snippet')
+      .send({
+        snippet: newCommand,
+        description: newDescription,
+        userID: secondUserID,
+        id: firstUserSnippetID,
+        secret: firstUserSecret,
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Invalid userID or secret/);
+  });
+
+  test('should not update a snippet if secret is not valid', async () => {
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
+      .put('/snippet')
+      .send({
+        snippet: newCommand,
+        description: newDescription,
+        userID: firstUserID,
+        id: firstUserSnippetID,
+        secret: 'foobar',
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Invalid userID or secret/);
+  });
+
+  test('should not update a snippet if ID does not exist', async () => {
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
+      .put('/snippet')
+      .send({
+        snippet: newCommand,
+        description: newDescription,
+        userID: firstUserID,
+        id: fakeSnippetID,
+        secret: firstUserSecret,
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/snippet not found for/);
+  });
+
+  test('should no update a snippet if ID is not valid', async () => {
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
+      .put('/snippet')
+      .send({
+        snippet: newCommand,
+        description: newDescription,
+        userID: firstUserID,
+        id: testGlobals.__INVALID_ID__,
+        secret: firstUserSecret,
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/invalid id format/);
+  });
 });
