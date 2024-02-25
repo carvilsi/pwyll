@@ -15,8 +15,8 @@ describe('snippets delete', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
-  const firstUserSecret = chance.string();
-  const secondUserSecret = chance.string();
+  const firstUserSecret = chance.string({ pool: 'abcdef01234456789'});
+  const secondUserSecret = chance.string({ pool: 'abcdef01234456789'});
   const fakeSnippetID = testGlobals.__FAKE_ID__;
 
   beforeAll(async () => {
@@ -42,6 +42,9 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
     secondUserID = JSON.parse(res.text);
+    console.log('================');
+    console.log(`secondUserSecret: ${secondUserSecret}`);
+    console.log(`secondUserID: ${secondUserID}`);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
@@ -61,16 +64,20 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
     secondUserSnippetID = JSON.parse(res.text);
+    console.log('-----------------');
+    console.log(`secondUserSnippetID: ${secondUserSnippetID}`);
   });
 
   test('should delete a snippet by id and for second user', async () => {
+    console.log('WTFFFFFFFFFFFFF');
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
         `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
-    expect(res.statusCode).toBe(200);
+    console.dir(res.text);
     let response = JSON.parse(res.text);
+    expect(res.statusCode).toBe(200);
     expect(response).toBe(true);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .get('/snippet/find')

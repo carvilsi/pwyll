@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import request from 'supertest';
 import testGlobals from './test_globals';
 
-describe('snippets CRUD', () => {
+describe('snippets update', () => {
   let firstUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
@@ -14,8 +14,8 @@ describe('snippets CRUD', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
-  const firstUserSecret = chance.string();
-  const secondUserSecret = chance.string();
+  const firstUserSecret = chance.string({ pool: 'abcdef01234456789'});
+  const secondUserSecret = chance.string({ pool: 'abcdef01234456789'});
   const fakeSnippetID = testGlobals.__FAKE_ID__;
   const newCommand = 'ls -la';
   const newDescription = 'list with hidden files and details';

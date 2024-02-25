@@ -63,12 +63,12 @@ export async function findSnippetByQuery(
         ],
       };
     }
-    const results = await collection
-      .find(mongoQuery)
+    const results = await collection?.find(mongoQuery)
       .limit(limitFind)
       .toArray();
     const snippets: Snippet[] = [];
-    for (const result of results) {
+    if (results != null) {
+      for (const result of results) {
       const snippet: Snippet = {
         snippet: result.snippet,
         description: result.description,
@@ -76,6 +76,7 @@ export async function findSnippetByQuery(
         username: result.user.username,
       };
       snippets.push(snippet);
+    }
     }
     return snippets;
   } catch (error) {
@@ -87,20 +88,24 @@ export async function findSnippetByID(
   snippetID: string
 ): Promise<Snippet | string | undefined> {
   try {
-    const collection = await getCollection(collectionName);
-    logger.debug(`try to find commands with id: ${snippetID}`);
-    const objectId = new ObjectId(snippetID);
-    const result = await collection.findOne({ _id: objectId });
-    if (result != null) {
-      const snippet: Snippet = {
-        snippet: result.snippet,
-        description: result.description,
-        _id: result._id,
-        user: result.user,
-      };
-      return snippet;
+    if (snippetID != null) {
+      const collection = await getCollection(collectionName);
+      logger.debug(`try to find commands with id: ${snippetID}`);
+      const objectId = new ObjectId(snippetID);
+      const result = await collection?.findOne({ _id: objectId });
+      if (result != null) {
+        const snippet: Snippet = {
+          snippet: result.snippet,
+          description: result.description,
+          _id: result._id,
+          user: result.user,
+        };
+        return snippet;
+      } else {
+        throw new Error(`snippet not found for ${snippetID}`);
+      }
     } else {
-      throw new Error(`snippet not found for ${snippetID}`);
+      throw new Error('bad request');
     }
   } catch (error) {
     errorControllerHandler(error);
@@ -114,7 +119,7 @@ export async function deleteSnippetByID(
 ): Promise<boolean | undefined> {
   try {
     const collection = await getCollection(collectionName);
-    if (snippetID != null && userID != null) {
+    if (snippetID != null && userID != null && secret != null) {
       const user = await findUserByID(userID, secret);
       const command = await findSnippetByID(snippetID);
       if (command != null) {
@@ -128,7 +133,7 @@ export async function deleteSnippetByID(
         }
       }
       const objectId = new ObjectId(snippetID);
-      const result = await collection.deleteOne({ _id: objectId });
+      const result = await collection?.deleteOne({ _id: objectId });
       if (result != null) {
         if (result.acknowledged && result.deletedCount === 1) return true;
       } else {
@@ -138,7 +143,6 @@ export async function deleteSnippetByID(
       throw new Error('bad request');
     }
   } catch (error) {
-    console.dir(error);
     errorControllerHandler(error);
   }
 }
@@ -156,7 +160,8 @@ export async function updateSnippet(
       id != null &&
       userID != null &&
       snippetUpdate != null &&
-      descriptionUpdate != null
+      descriptionUpdate != null &&
+      secret != null
     ) {
       const user = await findUserByID(userID, secret);
       if (user == null)
