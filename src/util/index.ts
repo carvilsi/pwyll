@@ -16,7 +16,7 @@ export function paramCheck(
   req: express.Request,
   mandatoryParams: Array<string>,
   { check = 'body' }: { check?: string } = {}
-): boolean {
+): void {
   for (const mandatoryParam of mandatoryParams) {
     const errMessage = `bad request for endpoint, mandatory: ${mandatoryParam}`;
     switch (check) {
@@ -33,7 +33,6 @@ export function paramCheck(
         break;
     }
   }
-  return true;
 }
 
 export function userLengthCheck(username: string): boolean {

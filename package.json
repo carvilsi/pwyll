@@ -4,16 +4,16 @@
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
-    "test-ci-cd": "cd test/; docker-compose down; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 10; ./node_modules/jest/bin/jest.js --runInBand test/",
+    "test-ci-cd": "cd test/; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 15; ./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "dev": "cd devops/dev; docker-compose up -d; cd -; nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
-    "dev-test": "cd devops/dev; docker-compose down; docker-compose up -d; cd -; sleep 10; ./node_modules/jest/bin/jest.js --runInBand test/",
+    "dev-test": "cd devops/dev; docker-compose up -d; cd -; sleep 15; ./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "build": "tsc",
     "start": "node lib/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts",
     "lint-test": "./node_modules/eslint/bin/eslint.js ./test/ --ext .ts",
     "lint-fix": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts --fix",
     "lint-test-fix": "./node_modules/eslint/bin/eslint.js ./test/ --ext .ts --fix",
-    "test": "jest",
+    "test": "jest --runInBand --force-exit",
     "pre-release": "npm audit && ./pre-release.sh",
     "release": "./git-tag-n-push.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
@@ -55,6 +55,7 @@
     "jest": "^29.7.0",
     "prettier": "^2.6.2",
     "supertest": "^6.2.2",
-    "ts-jest": "^29.1.2"
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2"
   }
 }
