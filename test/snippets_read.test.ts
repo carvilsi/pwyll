@@ -14,8 +14,8 @@ describe('snippets read (find)', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
-  const firstUserSecret = chance.string({ pool: 'abcdef01234456789'});
-  const secondUserSecret = chance.string({ pool: 'abcdef01234456789'});
+  const firstUserSecret = chance.string({ pool: 'abcdef01234456789' });
+  const secondUserSecret = chance.string({ pool: 'abcdef01234456789' });
   const fakeSnippetID = testGlobals.__FAKE_ID__;
 
   beforeAll(async () => {

@@ -2,23 +2,24 @@
 /* eslint-disable no-undef */
 /* eslint-disable node/no-unpublished-require */
 import { beforeAll, describe, expect, test } from '@jest/globals';
-import { userLengthCheck, secretLengthCheck, getHash, userExistenceCheck } from './../src/util'
+import {
+  userLengthCheck,
+  secretLengthCheck,
+  getHash,
+  userExistenceCheck,
+} from './../src/util';
 import testGlobals from './test_globals';
 import request from 'supertest';
-import { todo } from 'node:test';
 
 const Chance = require('chance');
 
-//TODO: --runInBand --detectOpenHandles --force-exit
-
 describe('utils', () => {
-  let firstUserID: string;
   const chance = new Chance();
   const firstUser = chance.name();
   const firstUserSecret = chance.string();
 
   beforeAll(async () => {
-    let res = await request(testGlobals.__PYWLL_SERVER_URL__)
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/user')
       .send({
         username: firstUser,
@@ -27,7 +28,6 @@ describe('utils', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
-    firstUserID = JSON.parse(res.text);
   });
 
   test('should check username length', () => {
@@ -36,15 +36,16 @@ describe('utils', () => {
   });
 
   test('should not allow username longer than 20 characters', () => {
-    expect(() => userLengthCheck('foobarfoobarfoobarfoobar'))
-    .toThrow('Username must be not longer than 20 characters');
+    expect(() => userLengthCheck('foobarfoobarfoobarfoobar')).toThrow(
+      'Username must be not longer than 20 characters'
+    );
   });
 
   test('should not allow an empty or blank username', () => {
     expect(() => userLengthCheck('')).toThrow('Provide a user name');
     expect(() => userLengthCheck('  ')).toThrow('Provide a user name');
   });
-  
+
   test('should not allow an empty or blank secret', () => {
     expect(() => secretLengthCheck('')).toThrow('Provide a secret');
     expect(() => secretLengthCheck('  ')).toThrow('Provide a secret');
@@ -54,7 +55,9 @@ describe('utils', () => {
 
   test('should get the has for foobar', () => {
     const res = getHash('foobar');
-    expect(res).toBe('c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2');
+    expect(res).toBe(
+      'c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2'
+    );
   });
 
   test('should success if username does not exists', async () => {
@@ -66,7 +69,9 @@ describe('utils', () => {
     try {
       await userExistenceCheck(firstUser);
     } catch (error) {
-      expect(error).toMatch(`User ${firstUser} already exists, please choose a different one`);
+      expect(error).toMatch(
+        `User ${firstUser} already exists, please choose a different one`
+      );
     }
   });
 });
