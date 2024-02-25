@@ -63,20 +63,21 @@ export async function findSnippetByQuery(
         ],
       };
     }
-    const results = await collection?.find(mongoQuery)
+    const results = await collection
+      ?.find(mongoQuery)
       .limit(limitFind)
       .toArray();
     const snippets: Snippet[] = [];
     if (results != null) {
       for (const result of results) {
-      const snippet: Snippet = {
-        snippet: result.snippet,
-        description: result.description,
-        _id: result._id,
-        username: result.user.username,
-      };
-      snippets.push(snippet);
-    }
+        const snippet: Snippet = {
+          snippet: result.snippet,
+          description: result.description,
+          _id: result._id,
+          username: result.user.username,
+        };
+        snippets.push(snippet);
+      }
     }
     return snippets;
   } catch (error) {
