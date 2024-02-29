@@ -96,15 +96,11 @@ export async function exportSnippets(
       user = await findUserByID(userID);
     }
     const count = await collection?.countDocuments({ user: user });
-    console.dir(count);
-
     const cursor = collection?.find({ user: user });
-    // console.dir(cursor.);
     const exportResponse: ExportSnippetsResposne = {
       streamContent: cursor.stream(),
       count,
     };
-    // return cursor.stream();
     return exportResponse;
   } catch (error) {
     errorControllerHandler(error);
