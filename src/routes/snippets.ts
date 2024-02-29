@@ -1,6 +1,6 @@
 const router = require('express').Router();
 import express from 'express';
-import { paramCheck } from '../util';
+import { logger, paramCheck } from '../util';
 import { errorRouteHandler } from '../errorHandlers';
 import {
   createSnippet,
@@ -8,7 +8,11 @@ import {
   findSnippetByID,
   deleteSnippetByID,
   updateSnippet,
+  exportSnippets,
 } from '../controllers/snippets_controller';
+import { getCollection } from '../db/mongo';
+import config from 'config';
+import { findUserByID } from '../controllers/users_controller';
 
 // adds a snippet
 // If does not comes with user id will be not possible to do RUD
@@ -55,6 +59,60 @@ router.get(
         snippets = await findSnippetByQuery(String(req.query.q));
       }
       res.status(200).send(snippets);
+    } catch (e) {
+      errorRouteHandler(e, next);
+    }
+  }
+);
+
+// streams all the snippet for the userID
+router.get(
+  '/export',
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    try {
+      // const collectionName = String(config.get('mongodb.collections.snippets'));
+      paramCheck(req, ['userID'], { check: 'query' });
+      const cursor = await exportSnippets(String(req.query.userID));
+      // cursor.stream({transform: JSON.stringify}).pipe(res);
+      const strm = cursor.stream({transform: JSON.stringify});
+      strm.on('data', (data: any) => {
+        console.log(data);
+        res.write(data);
+      });
+      strm.on('end', ()=>{res.end()});
+    //   const collection = await getCollection(collectionName);
+    //   const userID = req.query.userID;
+    // // logger.debug(
+    // //   `try to export snippets for user: ${userID!}`
+    // // );
+    // let user;
+    // if (userID != null) {
+    //   user = await findUserByID(<string>userID);
+    // }
+    // const cursor = collection?.find({ user: user });
+    // while (await cursor.hasNext()) {
+    //   const doc = await cursor.next();
+    //   const snippet: Snippet = {
+    //     snippet: doc?.snippet,
+    //     description: doc?.description,
+    //   }
+    //   res.write(JSON.stringify(cursor.next()));
+    // }
+      // console.log('-----');
+      // console.dir(snippet);
+      // console.log('-----');
+      // console.log('lolololololololololololol');
+      
+      // while (snippet) {
+      //   // console.dir(snippet);
+      //   res.write(JSON.stringify(snippet));
+      // }
+      // res.write(snippet.stream().on('data', (<any>doc) => JSON.stringify(doc)));
+      // res.end();
     } catch (e) {
       errorRouteHandler(e, next);
     }

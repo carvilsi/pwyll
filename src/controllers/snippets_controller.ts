@@ -1,6 +1,6 @@
 import { logger } from '../util';
 import { getCollection } from '../db/mongo';
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 import config from 'config';
 import { findUserByID } from './users_controller';
 import _ from 'lodash';
@@ -80,6 +80,53 @@ export async function findSnippetByQuery(
       }
     }
     return snippets;
+  } catch (error) {
+    errorControllerHandler(error);
+  }
+}
+
+export async function exportSnippets(
+  userID?: string
+// ): Promise<Snippet | null | undefined> {
+): Promise<any> {
+  try {
+    const collection = await getCollection(collectionName);
+    logger.debug(
+      `try to export snippets for user: ${userID!}`
+    );
+    let user;
+    if (userID != null) {
+      user = await findUserByID(userID);
+    }
+    const cursor = collection?.find({ user: user });
+    return cursor;
+    // cursor.stream().on('data', doc => {
+    //   // console.dir(doc)
+    //   const snippet: Snippet = {
+    //     snippet: doc?.snippet,
+    //     description: doc?.description,
+    //   }
+    //   console.dir(snippet);
+    //   return snippet;  
+    // });
+    // cursor.stream().on('end', () => {
+    //   return null;
+    // });
+    // const results = collection?.find({ user: user });
+    // while (await results.hasNext()) {
+    //   const doc = await results.next();
+    //   const snippet: Snippet = {
+    //     snippet: doc?.snippet,
+    //     description: doc?.description,
+    //   }
+    //   // console.log('-----');
+    //   console.dir(snippet);
+    //   // console.log('-----');
+
+    //   // return snippet;
+    //   // return await results.next();
+    // }
+    // return null;
   } catch (error) {
     errorControllerHandler(error);
   }
