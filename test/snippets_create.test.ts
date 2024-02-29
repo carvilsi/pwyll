@@ -10,6 +10,7 @@ describe('snippets create', () => {
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
+  const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
@@ -54,8 +55,8 @@ describe('snippets create', () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
-        snippet: 'nodemon src/',
-        description: 'generic nodemon for source folder changes',
+        snippet: secondSnippetObj.snippet,
+        description: secondSnippetObj.description,
         userID: secondUserID,
         secret: secondUserSecret,
       })

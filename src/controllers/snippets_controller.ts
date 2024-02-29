@@ -1,10 +1,10 @@
 import { logger } from '../util';
 import { getCollection } from '../db/mongo';
-import { ObjectId, WithId } from 'mongodb';
 import config from 'config';
 import { findUserByID } from './users_controller';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
+import { ObjectId } from 'mongodb';
 
 const collectionName = String(config.get('mongodb.collections.snippets'));
 const limitFind = Number(config.get('mongodb.limit'));
@@ -87,46 +87,25 @@ export async function findSnippetByQuery(
 
 export async function exportSnippets(
   userID?: string
-// ): Promise<Snippet | null | undefined> {
-): Promise<any> {
+): Promise<ExportSnippetsResposne | undefined> {
   try {
     const collection = await getCollection(collectionName);
-    logger.debug(
-      `try to export snippets for user: ${userID!}`
-    );
+    logger.debug(`try to export snippets for user: ${userID!}`);
     let user;
     if (userID != null) {
       user = await findUserByID(userID);
     }
-    const cursor = collection?.find({ user: user });
-    return cursor;
-    // cursor.stream().on('data', doc => {
-    //   // console.dir(doc)
-    //   const snippet: Snippet = {
-    //     snippet: doc?.snippet,
-    //     description: doc?.description,
-    //   }
-    //   console.dir(snippet);
-    //   return snippet;  
-    // });
-    // cursor.stream().on('end', () => {
-    //   return null;
-    // });
-    // const results = collection?.find({ user: user });
-    // while (await results.hasNext()) {
-    //   const doc = await results.next();
-    //   const snippet: Snippet = {
-    //     snippet: doc?.snippet,
-    //     description: doc?.description,
-    //   }
-    //   // console.log('-----');
-    //   console.dir(snippet);
-    //   // console.log('-----');
+    const count = await collection?.countDocuments({ user: user });
+    console.dir(count);
 
-    //   // return snippet;
-    //   // return await results.next();
-    // }
-    // return null;
+    const cursor = collection?.find({ user: user });
+    // console.dir(cursor.);
+    const exportResponse: ExportSnippetsResposne = {
+      streamContent: cursor.stream(),
+      count,
+    };
+    // return cursor.stream();
+    return exportResponse;
   } catch (error) {
     errorControllerHandler(error);
   }

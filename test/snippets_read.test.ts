@@ -11,6 +11,7 @@ describe('snippets read (find)', () => {
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
+  const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
@@ -51,8 +52,8 @@ describe('snippets read (find)', () => {
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
-        snippet: 'nodemon src/',
-        description: 'generic nodemon for source folder changes',
+        snippet: secondSnippetObj.snippet,
+        description: secondSnippetObj.description,
         userID: secondUserID,
         secret: secondUserSecret,
       })
@@ -122,7 +123,10 @@ describe('snippets read (find)', () => {
   test('should not find a snippet by query if does not match any', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .get('/snippet/find')
-      .query({ q: 'foobar' })
+      .query({
+        q: 'foobar',
+        userID: firstUserID,
+      })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     expect(JSON.parse(res.text).length).toBe(0);

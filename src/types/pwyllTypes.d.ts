@@ -21,3 +21,8 @@ type Info = {
   version: string;
   name: string;
 };
+
+type ExportSnippetsResposne = {
+  streamContent: Readable & AsyncIterable<WithId<Document>>;
+  count: number;
+};
