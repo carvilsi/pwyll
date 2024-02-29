@@ -8,6 +8,7 @@ import {
   findSnippetByID,
   deleteSnippetByID,
   updateSnippet,
+  exportSnippets,
 } from '../controllers/snippets_controller';
 
 // adds a snippet
@@ -55,6 +56,38 @@ router.get(
         snippets = await findSnippetByQuery(String(req.query.q));
       }
       res.status(200).send(snippets);
+    } catch (e) {
+      errorRouteHandler(e, next);
+    }
+  }
+);
+
+// streams all the snippet for the userID
+router.get(
+  '/export',
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    try {
+      paramCheck(req, ['userID'], { check: 'query' });
+      const exportSnippetsResposne = await exportSnippets(
+        String(req.query.userID)
+      );
+      if (exportSnippetsResposne != null) {
+        let counter = 0;
+        exportSnippetsResposne.streamContent.on('data', (data: unknown) => {
+          if (counter === 0) res.write('[');
+          res.write(JSON.stringify(data));
+          if (counter < exportSnippetsResposne.count - 1) res.write(',');
+          counter++;
+        });
+        exportSnippetsResposne.streamContent.on('end', () => {
+          res.write(']');
+          res.end();
+        });
+      }
     } catch (e) {
       errorRouteHandler(e, next);
     }

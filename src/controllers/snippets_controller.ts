@@ -1,10 +1,10 @@
 import { logger } from '../util';
 import { getCollection } from '../db/mongo';
-import { ObjectId } from 'mongodb';
 import config from 'config';
 import { findUserByID } from './users_controller';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
+import { ObjectId } from 'mongodb';
 
 const collectionName = String(config.get('mongodb.collections.snippets'));
 const limitFind = Number(config.get('mongodb.limit'));
@@ -80,6 +80,28 @@ export async function findSnippetByQuery(
       }
     }
     return snippets;
+  } catch (error) {
+    errorControllerHandler(error);
+  }
+}
+
+export async function exportSnippets(
+  userID?: string
+): Promise<ExportSnippetsResposne | undefined> {
+  try {
+    const collection = await getCollection(collectionName);
+    logger.debug(`try to export snippets for user: ${userID!}`);
+    let user;
+    if (userID != null) {
+      user = await findUserByID(userID);
+    }
+    const count = await collection?.countDocuments({ user: user });
+    const cursor = collection?.find({ user: user });
+    const exportResponse: ExportSnippetsResposne = {
+      streamContent: cursor.stream(),
+      count,
+    };
+    return exportResponse;
   } catch (error) {
     errorControllerHandler(error);
   }
