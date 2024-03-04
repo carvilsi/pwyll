@@ -1,5 +1,17 @@
 # Changelog
 
+# [v3.0.0](https://github.com/carvilsi/pwyll/releases/tag/v3.0.0) (2024-03-04)
+
+- added export functionality 
+- added test for export functionality
+- added more tests to update snippets
+- improving tests
+- adding info endpoint to retrieve object with version and name 
+- adding test for info endpoint
+- implemented user secret 
+- improved herror handling 
+- added linter to tests
+
 # [v2.0.0](https://github.com/carvilsi/pwyll/releases/tag/v2.0.0) (2024-02-20)
 
 - fixing linting thing
