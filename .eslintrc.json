@@ -15,6 +15,7 @@
     "no-var": "error",
     "prefer-const": "warn",
     "eol-last": "error",
+    "no-console": "error",
     "prefer-arrow-callback": "error",
     "no-trailing-spaces": "error",
     "quotes": ["warn", "single", { "avoidEscape": true }],
