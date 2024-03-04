@@ -41,4 +41,3 @@ If you do not want to have Docker, then just run an instance of MongoDB locally 
 Feedback from usage and contributions are very welcome.
 Also if you like it, please leave a :star: I would appreciate it ;)
 
-<3 & Hack the Planet!

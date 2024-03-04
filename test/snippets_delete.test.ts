@@ -12,6 +12,7 @@ describe('snippets delete', () => {
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
+  const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
@@ -42,9 +43,6 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
     secondUserID = JSON.parse(res.text);
-    console.log('================');
-    console.log(`secondUserSecret: ${secondUserSecret}`);
-    console.log(`secondUserID: ${secondUserID}`);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
@@ -55,8 +53,8 @@ describe('snippets delete', () => {
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send({
-        snippet: 'nodemon src/',
-        description: 'generic nodemon for source folder changes',
+        snippet: secondSnippetObj.snippet,
+        description: secondSnippetObj.description,
         userID: secondUserID,
         secret: secondUserSecret,
       })
@@ -64,18 +62,14 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
     secondUserSnippetID = JSON.parse(res.text);
-    console.log('-----------------');
-    console.log(`secondUserSnippetID: ${secondUserSnippetID}`);
   });
 
   test('should delete a snippet by id and for second user', async () => {
-    console.log('WTFFFFFFFFFFFFF');
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .delete(
         `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
       .set('Accept', 'application/json');
-    console.dir(res.text);
     let response = JSON.parse(res.text);
     expect(res.statusCode).toBe(200);
     expect(response).toBe(true);
