@@ -1,5 +1,12 @@
 # Changelog
 
+# [v4.0.0](https://github.com/carvilsi/pwyll/releases/tag/v4.0.0) (2024-03-14)
+
+- increassing hashing algorithm to SHA3-512 
+- dressing the secret with salt and pepper 
+- adding tests
+- this release it's going to break old users, you can export, trhow the database, create a new user and import the snippets again. Sorry, but I guess that anyone is using pwyll -.-
+
 # [v3.0.0](https://github.com/carvilsi/pwyll/releases/tag/v3.0.0) (2024-03-04)
 
 - added export functionality 

@@ -1,12 +1,12 @@
 {
   "name": "pwyll",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
     "test-ci-cd": "cd test/; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 15; ./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "dev": "cd devops/dev; docker-compose up -d; cd -; nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
-    "dev-test": "cd devops/dev; docker-compose up -d; cd -; sleep 15; ./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
+    "dev-test": "./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "build": "tsc",
     "start": "node lib/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts",
@@ -14,7 +14,7 @@
     "lint-fix": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts --fix",
     "lint-test-fix": "./node_modules/eslint/bin/eslint.js ./test/ --ext .ts --fix",
     "test": "jest --runInBand --force-exit",
-    "pre-release": "npm audit && ./pre-release.sh",
+    "pre-release": "npm audit && ./pre-release.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "release": "./git-tag-n-push.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
   },

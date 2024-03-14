@@ -1,11 +1,14 @@
 import { findUserByName } from '../controllers/users_controller';
+import { getSaltOrCreateOne } from '../controllers/sec_controller';
 import express from 'express';
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 
 const Logger = require('logplease');
 export const info = require('./../../package.json');
 import config from 'config';
+
 const logLevel = config.get('logLevel');
+const pepper = process.env.PEPPER_VALUE || config.get('pepper');
 Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
@@ -54,8 +57,13 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
   return true;
 }
 
-export function getHash(secret: string): string {
-  const hash = createHash('sha256');
-  hash.update(secret);
+export async function getHash(secret: string): Promise<string> {
+  const hash = createHash('sha3-512');
+  const salt = await getSaltOrCreateOne();
+  hash.update(`${salt}${secret}${pepper}`);
   return hash.digest('hex');
+}
+
+export function generateSalt(): string {
+  return randomBytes(40).toString('base64');
 }
