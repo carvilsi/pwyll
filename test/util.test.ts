@@ -7,9 +7,13 @@ import {
   secretLengthCheck,
   getHash,
   userExistenceCheck,
+  generateSalt,
 } from './../src/util';
 import testGlobals from './test_globals';
 import request from 'supertest';
+import config from 'config';
+import { createHash } from 'node:crypto';
+import { getSaltOrCreateOne } from '../src/controllers/sec_controller';
 
 const Chance = require('chance');
 
@@ -53,11 +57,19 @@ describe('utils', () => {
     expect(res).toBe(true);
   });
 
-  test('should get the has for foobar', () => {
-    const res = getHash('foobar');
-    expect(res).toBe(
-      'c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2'
-    );
+  test('should get the has for foobar', async () => {
+    const secret = 'foobar';
+    const pepper = config.get('pepper');
+    const hash = createHash('sha3-512');
+    const salt = await getSaltOrCreateOne();
+    hash.update(`${salt}${secret}${pepper}`);
+    const res = await getHash(secret);
+    expect(res).toBe(hash.digest('hex'));
+  });
+
+  test('should generate salt for db', () => {
+    const salt = generateSalt();
+    expect(salt.length).toBe(56);
   });
 
   test('should success if username does not exists', async () => {
