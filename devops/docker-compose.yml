@@ -13,11 +13,13 @@ services:
       - ./mongo-volume:/data/db
 
   pwyll:
-    image: carvilsi/pwyll:3.0.0
+    image: carvilsi/pwyll:3.1.0-release.0
     restart: always
     ports:
       - '46520:46520'
     environment:
       NODE_ENV: 'production'
+      #positively change the pepper value 
+      PEPPER_VALUE: 'sBWKMA03SOim+ldnpSBWwx7eDWVIcAjvTV0a2XrFvwqMKw6Jc+HLZA=='
     depends_on:
       - mongo

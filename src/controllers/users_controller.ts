@@ -6,8 +6,6 @@ import { UserIdentityError, errorControllerHandler } from '../errorHandlers';
 
 const collectionName = String(config.get('mongodb.collections.users'));
 
-//XXX: mongo it's returning a sequental ID, this is not the best
-//approach... maybe add a password or give a generated uuid
 export async function createUser(
   username: string,
   secret: string
@@ -16,7 +14,7 @@ export async function createUser(
     const collection = await getCollection(collectionName);
     const user: User = {
       username: username,
-      secret: getHash(secret),
+      secret: await getHash(secret),
     };
     const insertResult = await collection.insertOne(user);
     logger.debug('Inserted user =>', insertResult);
@@ -39,7 +37,7 @@ export async function findUserByID(
     const userQuery: QueryUser = {
       _id: objectId,
     };
-    if (typeof secret !== 'undefined') userQuery.secret = getHash(secret);
+    if (typeof secret !== 'undefined') userQuery.secret = await getHash(secret);
     const result = await collection.findOne(userQuery);
 
     if (result != null) {
