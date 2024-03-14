@@ -15,7 +15,7 @@
     "lint-test-fix": "./node_modules/eslint/bin/eslint.js ./test/ --ext .ts --fix",
     "test": "jest --runInBand --force-exit",
     "pre-release": "npm audit && ./pre-release.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
-    "release": "./git-tag-n-push.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
+    "release": "./git-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
   },
   "keywords": [],
