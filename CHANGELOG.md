@@ -1,6 +1,6 @@
 # Changelog
 
-# [v3.1.0-release.0](https://github.com/carvilsi/pwyll/releases/tag/v3.1.0-release.0) (2024-03-14)
+# [v4.0.0](https://github.com/carvilsi/pwyll/releases/tag/v4.0.0) (2024-03-14)
 
 - increassing hashing algorithm to SHA3-512 
 - dressing the secret with salt and pepper 
