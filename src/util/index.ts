@@ -6,8 +6,9 @@ import { createHash, randomBytes } from 'node:crypto';
 const Logger = require('logplease');
 export const info = require('./../../package.json');
 import config from 'config';
+
 const logLevel = config.get('logLevel');
-const pepper = config.get('pepper');
+const pepper = process.env.PEPPER_VALUE || config.get('pepper');
 Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 

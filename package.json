@@ -1,6 +1,6 @@
 {
   "name": "pwyll",
-  "version": "3.0.0",
+  "version": "3.1.0-release.0",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "lint-fix": "./node_modules/eslint/bin/eslint.js ./src/ --ext .ts --fix",
     "lint-test-fix": "./node_modules/eslint/bin/eslint.js ./test/ --ext .ts --fix",
     "test": "jest --runInBand --force-exit",
-    "pre-release": "npm audit && ./pre-release.sh",
+    "pre-release": "npm audit && ./pre-release.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "release": "./git-tag-n-push.sh && ./docker-build.sh && ./docker-tag-n-push.sh",
     "watch": "nodemon -e js,ts -x ts-node -i test/ --files src/index.ts"
   },
