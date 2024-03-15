@@ -9,6 +9,8 @@ import config from 'config';
 
 const logLevel = config.get('logLevel');
 const pepper = process.env.PEPPER_VALUE || config.get('pepper');
+const forbiddenUserNames: string[] = config.get('forbiddenUserNames');
+
 Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
@@ -47,6 +49,12 @@ export function userLengthCheck(username: string): boolean {
 
 export function secretLengthCheck(secret: string): boolean {
   if (!secret.trim().length) throw 'Provide a secret';
+  return true;
+}
+
+export function forbiddenNameCheck(username: string): boolean {
+  if (forbiddenUserNames.includes(username.toLocaleLowerCase()))
+    throw `${username} is a forbidden name, please choose a different`;
   return true;
 }
 

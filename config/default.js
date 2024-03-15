@@ -4,6 +4,10 @@ module.exports = {
   // positivelly you want to change this, here or override on production.js
   // also you can change this value at the docker-compose file
   pepper: 'M+Sleqzn9Fd/vDtgi/dY4aOAPTCdrf778UdH+BBWQYgVbKVNvk7nJQ==',
+  forbiddenUserNames: [
+    'anyone',
+    'pwyll'
+  ],
   mongodb: {
     user: 'root',
     // positivelly you want to change this, here or override on production.js

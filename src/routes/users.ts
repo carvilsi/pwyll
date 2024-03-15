@@ -6,6 +6,7 @@ import {
   userLengthCheck,
   secretLengthCheck,
   userExistenceCheck,
+  forbiddenNameCheck,
 } from '../util';
 import { errorRouteHandler } from '../errorHandlers';
 import { createUser } from '../controllers/users_controller';
@@ -24,6 +25,7 @@ router.post(
       const secret = req.body.secret;
       userLengthCheck(username);
       secretLengthCheck(secret);
+      forbiddenNameCheck(username);
       await userExistenceCheck(username);
       const id = await createUser(username, secret);
       res.status(200).send(id);
