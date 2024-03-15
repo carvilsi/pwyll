@@ -12,6 +12,7 @@ type TestGlobals = {
   __FAKE_ID__: string;
   __INVALID_ID__: string;
   __EXPORT_FILE__: string;
+  __FORBIDDEN_USER_NAMES__: string[];
 };
 
 const testGlobals: TestGlobals = {
@@ -29,6 +30,7 @@ const testGlobals: TestGlobals = {
   __INVALID_ID__: '000aa0000a0aa0000a00a23',
   __FAKE_ID__: '625ae0149d0bd9638b60e498',
   __EXPORT_FILE__: 'export-file.json',
+  __FORBIDDEN_USER_NAMES__: ['anyone', 'pwyll', 'Anyone', 'PWYLL'],
 };
 
 export default testGlobals;

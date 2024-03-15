@@ -2,9 +2,10 @@
 const pckg = require('./../package.json');
 import { describe, expect, test } from '@jest/globals';
 import request from 'supertest';
+import testGlobals from './test_globals';
 
 describe('get the info', () => {
-  const pwyll_machine = 'http://localhost:46520';
+  const pwyll_machine = testGlobals.__PYWLL_SERVER_URL__;
 
   test('should retieve info text', async () => {
     const response = await request(pwyll_machine).get('/');
