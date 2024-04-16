@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import config from 'config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -16,6 +17,7 @@ import { getDb } from './db/mongo';
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(helmet());
 
 const http = require('http').createServer(app);
 app.use(express.json());
