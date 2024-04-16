@@ -6,6 +6,7 @@
   "scripts": {
     "test-ci-cd": "cd test/; sudo docker-compose up --build --force-recreate -d; cd ..; sleep 15; ./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "dev": "cd devops/dev; docker-compose up -d; cd -; nodemon -e js,ts -x ts-node -i test/ --files src/index.ts",
+    "stop-dev": "cd devops/dev; docker-compose down; cd -",
     "dev-test": "./node_modules/jest/bin/jest.js --runInBand --force-exit test/",
     "build": "tsc",
     "start": "node lib/index.js",
