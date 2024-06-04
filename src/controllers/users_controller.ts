@@ -1,4 +1,4 @@
-import { logger, getHash } from './../util';
+import { logger, getArgon2Hash, validateArgon2Hash } from './../util';
 import { getCollection } from './../db/mongo';
 import { ObjectId } from 'mongodb';
 import config from 'config';
@@ -14,7 +14,7 @@ export async function createUser(
     const collection = await getCollection(collectionName);
     const user: User = {
       username: username,
-      secret: await getHash(secret),
+      secret: await getArgon2Hash(secret),
     };
     const insertResult = await collection.insertOne(user);
     logger.debug('Inserted user =>', insertResult);
@@ -37,7 +37,7 @@ export async function findUserByID(
     const userQuery: QueryUser = {
       _id: objectId,
     };
-    if (typeof secret !== 'undefined') userQuery.secret = await getHash(secret);
+
     const result = await collection.findOne(userQuery);
 
     if (result != null) {
@@ -45,6 +45,12 @@ export async function findUserByID(
         username: result.username,
         _id: result._id,
       };
+
+      if (typeof secret !== 'undefined') {
+        const valid = await validateArgon2Hash(result.secret, secret);
+        if (!valid) throw new UserIdentityError('Invalid userID or secret');
+      }
+
       return user;
     } else {
       throw new UserIdentityError('Invalid userID or secret');

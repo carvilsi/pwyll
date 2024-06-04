@@ -1,9 +1,15 @@
 module.exports = {
   port: 46520,
   logLevel: 'DEBUG',
-  // positivelly you want to change this, here or override on production.js
-  // also you can change this value at the docker-compose file
-  pepper: 'M+Sleqzn9Fd/vDtgi/dY4aOAPTCdrf778UdH+BBWQYgVbKVNvk7nJQ==',
+  security: {
+    // positivelly you want to change this, here or override on production.js
+    // also you can change this value at the docker-compose file
+    pepper: 'M+Sleqzn9Fd/vDtgi/dY4aOAPTCdrf778UdH+BBWQYgVbKVNvk7nJQ==',
+    // heads up with these 2 values of argon2 implementation
+    // be sure you know what are you doing
+    argon2TimeCost: 4,
+    argon2Parallelism: 5,
+  },
   forbiddenUserNames: [
     'anyone',
     'pwyll'
@@ -18,7 +24,6 @@ module.exports = {
     collections: {
       snippets: 'snippets',
       users: 'users',
-      security: 'sec',
     },
     limit: 5,
   },
