@@ -2,14 +2,20 @@ const router = require('express').Router();
 import express from 'express';
 
 import {
-  paramCheck,
   userLengthCheck,
-  secretLengthCheck,
   userExistenceCheck,
   forbiddenNameCheck,
 } from '../util';
 import { errorRouteHandler } from '../errorHandlers';
 import { createUser } from '../controllers/users_controller';
+import config from 'config';
+import { secretExistenceCheck, secretPoliciesCheck } from '../util/security';
+import { paramCheck } from '../util/routes';
+
+const ENABLE_SECRET_POLICIES = Boolean(
+  process.env.ENABLE_SECRET_POLICIES ||
+    config.get('security.enableSecretPolicies')
+);
 
 // adds a user
 router.post(
@@ -24,9 +30,10 @@ router.post(
       const username = req.body.username;
       const secret = req.body.secret;
       userLengthCheck(username);
-      secretLengthCheck(secret);
       forbiddenNameCheck(username);
       await userExistenceCheck(username);
+      secretExistenceCheck(secret);
+      if (ENABLE_SECRET_POLICIES) secretPoliciesCheck(secret);
       const id = await createUser(username, secret);
       res.status(200).send(id);
     } catch (e) {

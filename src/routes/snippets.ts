@@ -1,6 +1,6 @@
 const router = require('express').Router();
 import express from 'express';
-import { paramCheck } from '../util';
+import { paramCheck } from '../util/routes';
 import { errorRouteHandler } from '../errorHandlers';
 import {
   createSnippet,

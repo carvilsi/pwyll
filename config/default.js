@@ -9,6 +9,18 @@ module.exports = {
     // be sure you know what are you doing
     argon2TimeCost: 4,
     argon2Parallelism: 5,
+    enableSecretPolicies: true,
+    secretPolicies: {
+      commonPassword: false,
+      passwordLength: 20,
+      shannonEntropyBits: 80,
+      strengthCode: ['STRONG', 'VERY_STRONG'] ,
+      number: true,
+      lower: true,
+      upper: true,
+      punctuation: true,
+      symbol: true,
+    }
   },
   forbiddenUserNames: [
     'anyone',
