@@ -1,8 +1,9 @@
-import { logger, getArgon2Hash, validateArgon2Hash } from './../util';
+import { logger } from './../util';
 import { getCollection } from './../db/mongo';
 import { ObjectId } from 'mongodb';
 import config from 'config';
 import { UserIdentityError, errorControllerHandler } from '../errorHandlers';
+import { getArgon2Hash, validateArgon2Hash } from '../util/security';
 
 const collectionName = String(config.get('mongodb.collections.users'));
 

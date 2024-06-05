@@ -44,7 +44,10 @@ describe('users ', () => {
   test('should not allow creating users with forbidden names', async () => {
     const forbiddenNames = testGlobals.__FORBIDDEN_USER_NAMES__;
     for (let i = 0; i < forbiddenNames.length; i++) {
-      const res = await createUser(forbiddenNames[i], testGlobals.__STRONG_SECRET__);
+      const res = await createUser(
+        forbiddenNames[i],
+        testGlobals.__STRONG_SECRET__
+      );
       expect(res.statusCode).toBe(500);
       expect(res.text).toMatch(
         /is a forbidden name, please choose a different/
@@ -53,7 +56,10 @@ describe('users ', () => {
   });
 
   test('should not allow creating a very long username', async () => {
-    const res = await createUser('CthulhuTheOneThatSleepsDead', testGlobals.__STRONG_SECRET__);
+    const res = await createUser(
+      'CthulhuTheOneThatSleepsDead',
+      testGlobals.__STRONG_SECRET__
+    );
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Username must be not longer than 20 characters/);
   });

@@ -2,7 +2,6 @@ const router = require('express').Router();
 import express from 'express';
 
 import {
-  paramCheck,
   userLengthCheck,
   userExistenceCheck,
   forbiddenNameCheck,
@@ -11,6 +10,7 @@ import { errorRouteHandler } from '../errorHandlers';
 import { createUser } from '../controllers/users_controller';
 import config from 'config';
 import { secretExistenceCheck, secretPoliciesCheck } from '../util/security';
+import { paramCheck } from '../util/routes';
 
 const ENABLE_SECRET_POLICIES = Boolean(
   process.env.ENABLE_SECRET_POLICIES ||

@@ -1,6 +1,40 @@
 import config from 'config';
+import { randomBytes } from 'node:crypto';
+import * as argon2 from 'argon2';
+import { UserIdentityError } from '../errorHandlers';
 const taiPasswordStrength = require('tai-password-strength');
 const strengthTester = new taiPasswordStrength.PasswordStrength();
+
+// this extra value will be stored in the hash of argon2
+const PEPPER: string =
+  process.env.PEPPER_VALUE || config.get('security.pepper');
+const ASSOCIATED_DATA_ARGON2 = Buffer.from(randomBytes(64));
+const ARGON2_TIME_COST = Number(
+  process.env.ARGON2_TIME_COST || config.get('security.argon2TimeCost')
+);
+const ARGON2_PARALLELISM = Number(
+  process.env.ARGON2_PARALLELISM || config.get('security.argon2Parallelism')
+);
+
+export async function getArgon2Hash(secret: string): Promise<string> {
+  return await argon2.hash(secret, {
+    secret: Buffer.from(PEPPER),
+    associatedData: ASSOCIATED_DATA_ARGON2,
+    timeCost: ARGON2_TIME_COST,
+    parallelism: ARGON2_PARALLELISM,
+  });
+}
+
+export async function validateArgon2Hash(
+  hashedSecret: string,
+  password: string
+): Promise<boolean> {
+  const valid = await argon2.verify(hashedSecret, password, {
+    secret: Buffer.from(PEPPER),
+  });
+  if (!valid) throw new UserIdentityError('Invalid userID or secret');
+  return valid;
+}
 
 export function secretExistenceCheck(secret: string): boolean {
   if (!secret.trim().length) throw 'Provide a secret';
