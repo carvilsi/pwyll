@@ -5,8 +5,6 @@ type SnippetObject = {
   secret?: string;
 };
 
-// ['STRONG', 'VERY_STRONG']
-
 type ConfigSecretPolicies = {
   commonPassword?: boolean;
   passwordLength?: number;
