@@ -4,23 +4,18 @@
 import { beforeAll, describe, expect, test } from '@jest/globals';
 import {
   userLengthCheck,
-  secretLengthCheck,
-  getHash,
   userExistenceCheck,
-  generateSalt,
+  forbiddenNameCheck,
 } from './../src/util';
 import testGlobals from './test_globals';
 import request from 'supertest';
-import config from 'config';
-import { createHash } from 'node:crypto';
-import { getSaltOrCreateOne } from '../src/controllers/sec_controller';
 
 const Chance = require('chance');
 
 describe('utils', () => {
   const chance = new Chance();
   const firstUser = chance.name();
-  const firstUserSecret = chance.string();
+  const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
@@ -50,28 +45,6 @@ describe('utils', () => {
     expect(() => userLengthCheck('  ')).toThrow('Provide a user name');
   });
 
-  test('should not allow an empty or blank secret', () => {
-    expect(() => secretLengthCheck('')).toThrow('Provide a secret');
-    expect(() => secretLengthCheck('  ')).toThrow('Provide a secret');
-    const res = secretLengthCheck('big-foobar-secret');
-    expect(res).toBe(true);
-  });
-
-  test('should get the has for foobar', async () => {
-    const secret = 'foobar';
-    const pepper = config.get('pepper');
-    const hash = createHash('sha3-512');
-    const salt = await getSaltOrCreateOne();
-    hash.update(`${salt}${secret}${pepper}`);
-    const res = await getHash(secret);
-    expect(res).toBe(hash.digest('hex'));
-  });
-
-  test('should generate salt for db', () => {
-    const salt = generateSalt();
-    expect(salt.length).toBe(56);
-  });
-
   test('should success if username does not exists', async () => {
     const res = await userExistenceCheck('foobarlol');
     expect(res).toBe(true);
@@ -83,6 +56,22 @@ describe('utils', () => {
     } catch (error) {
       expect(error).toMatch(
         `User ${firstUser} already exists, please choose a different one`
+      );
+    }
+  });
+
+  test('should success if username is allowed', () => {
+    const res = forbiddenNameCheck('foobarlol');
+    expect(res).toBe(true);
+  });
+
+  test('should fail if the username is forbidden', () => {
+    const forbiddenName = testGlobals.__FORBIDDEN_USER_NAMES__[0];
+    try {
+      forbiddenNameCheck(forbiddenName);
+    } catch (error) {
+      expect(error).toMatch(
+        `${forbiddenName} is a forbidden name, please choose a different`
       );
     }
   });

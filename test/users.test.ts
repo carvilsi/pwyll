@@ -24,7 +24,7 @@ describe('users ', () => {
   const name = chance.name();
 
   test('should create a user', async () => {
-    const res = await createUser(name, 'my secret');
+    const res = await createUser(name, testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(200);
     expect(res.text.length).toBe(26);
   });
@@ -36,7 +36,7 @@ describe('users ', () => {
   });
 
   test('should not allow creating an existing user', async () => {
-    const res = await createUser(name, 'my secret');
+    const res = await createUser(name, testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/already exists, please choose a different/);
   });
@@ -44,7 +44,10 @@ describe('users ', () => {
   test('should not allow creating users with forbidden names', async () => {
     const forbiddenNames = testGlobals.__FORBIDDEN_USER_NAMES__;
     for (let i = 0; i < forbiddenNames.length; i++) {
-      const res = await createUser(forbiddenNames[i], 'my secret');
+      const res = await createUser(
+        forbiddenNames[i],
+        testGlobals.__STRONG_SECRET__
+      );
       expect(res.statusCode).toBe(500);
       expect(res.text).toMatch(
         /is a forbidden name, please choose a different/
@@ -53,7 +56,10 @@ describe('users ', () => {
   });
 
   test('should not allow creating a very long username', async () => {
-    const res = await createUser('CthulhuTheOneThatSleepsDead', 'my secret');
+    const res = await createUser(
+      'CthulhuTheOneThatSleepsDead',
+      testGlobals.__STRONG_SECRET__
+    );
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Username must be not longer than 20 characters/);
   });
@@ -65,25 +71,25 @@ describe('users ', () => {
   });
 
   test('should not allow creating a user with empty username', async () => {
-    const res = await createUser('', 'my secret');
+    const res = await createUser('', testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a user name/);
   });
 
   test('should not allow creating a user with blank username', async () => {
-    const res = await createUser('        ', 'my secret');
+    const res = await createUser('        ', testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a user name/);
   });
 
   test('should not allow creating a user with empty secret', async () => {
-    const res = await createUser('Aragorn', '');
+    const res = await createUser(chance.name(), '');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a secret/);
   });
 
   test('should not allow creating a user with blank secret', async () => {
-    const res = await createUser('Gandalf', '     ');
+    const res = await createUser(chance.name(), '     ');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a secret/);
   });

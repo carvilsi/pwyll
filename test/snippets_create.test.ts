@@ -14,8 +14,8 @@ describe('snippets create', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
-  const firstUserSecret = chance.string({ pool: 'abcdef01234456789' });
-  const secondUserSecret = chance.string({ pool: 'abcdef01234456789' });
+  const firstUserSecret = testGlobals.__STRONG_SECRET__;
+  const secondUserSecret = testGlobals.__SECOND_STRONG_SECRET__;
 
   beforeAll(async () => {
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)

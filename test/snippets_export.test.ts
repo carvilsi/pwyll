@@ -18,7 +18,7 @@ describe('snippets export', () => {
   const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
   const firstUsername = chance.name();
-  const firstUserSecret = chance.string({ pool: 'abcdef01234456789' });
+  const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)

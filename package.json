@@ -1,6 +1,6 @@
 {
   "name": "pwyll",
-  "version": "4.1.0",
+  "version": "5.0.0",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
@@ -23,6 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "argon2": "^0.40.3",
     "bluebird": "^3.7.2",
     "body-parser": "^1.20.2",
     "config": "^3.3.11",
@@ -35,7 +36,7 @@
     "lodash": "^4.17.21",
     "logplease": "^1.2.15",
     "mongodb": "^6.3.0",
-    "Router": "^2.1.0"
+    "tai-password-strength": "^1.1.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
