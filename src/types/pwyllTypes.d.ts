@@ -26,7 +26,3 @@ type ExportSnippetsResposne = {
   streamContent: Readable & AsyncIterable<WithId<Document>>;
   count: number;
 };
-
-type Salt = {
-  value: string;
-};
