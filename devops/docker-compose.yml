@@ -6,6 +6,7 @@ services:
       - '27017:27017'
     environment:
       MONGO_INITDB_ROOT_USERNAME: 'root'
+      #positively change this password db on production
       MONGO_INITDB_ROOT_PASSWORD: 'pwy11'
     volumes:
       - ./mongo-volume:/data/db

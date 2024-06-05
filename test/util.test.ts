@@ -4,7 +4,6 @@
 import { beforeAll, describe, expect, test } from '@jest/globals';
 import {
   userLengthCheck,
-  secretLengthCheck,
   userExistenceCheck,
   getArgon2Hash,
   validateArgon2Hash,
@@ -18,7 +17,7 @@ const Chance = require('chance');
 describe('utils', () => {
   const chance = new Chance();
   const firstUser = chance.name();
-  const firstUserSecret = chance.string();
+  const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
@@ -46,13 +45,6 @@ describe('utils', () => {
   test('should not allow an empty or blank username', () => {
     expect(() => userLengthCheck('')).toThrow('Provide a user name');
     expect(() => userLengthCheck('  ')).toThrow('Provide a user name');
-  });
-
-  test('should not allow an empty or blank secret', () => {
-    expect(() => secretLengthCheck('')).toThrow('Provide a secret');
-    expect(() => secretLengthCheck('  ')).toThrow('Provide a secret');
-    const res = secretLengthCheck('big-foobar-secret');
-    expect(res).toBe(true);
   });
 
   test('should get the argon2 hash for foobar', async () => {

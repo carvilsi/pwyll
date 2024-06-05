@@ -11,8 +11,6 @@ import infoapp from './routes/infoapp';
 import users from './routes/users';
 import { getDb } from './db/mongo';
 
-//TODO: what if config user exists but not at db.
-
 // all CORS requests
 const app = express();
 app.use(cors());
@@ -53,4 +51,4 @@ async function main() {
 }
 
 main();
-// TODO: export from pet
+

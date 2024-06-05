@@ -15,7 +15,8 @@ Logger.setLogLevel(logLevel);
 export const logger = Logger.create(`${info.name}`);
 
 // this extra value will be stored in the hash of argon2
-const PEPPER: string = process.env.PEPPER_VALUE || config.get('security.pepper');
+const PEPPER: string =
+  process.env.PEPPER_VALUE || config.get('security.pepper');
 const ASSOCIATED_DATA_ARGON2 = Buffer.from(randomBytes(64));
 const ARGON2_TIME_COST = Number(
   process.env.ARGON2_TIME_COST || config.get('security.argon2TimeCost')
@@ -54,13 +55,6 @@ export function userLengthCheck(username: string): boolean {
   if (!username.trim().length) throw 'Provide a user name';
   if (username.length > 20)
     throw 'Username must be not longer than 20 characters';
-  return true;
-}
-
-// TODO: add a minimun length
-// TODO: maybe also a strength checker
-export function secretLengthCheck(secret: string): boolean {
-  if (!secret.trim().length) throw 'Provide a secret';
   return true;
 }
 
