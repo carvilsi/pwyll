@@ -1,4 +1,5 @@
 import express from 'express';
+import helmet from 'helmet';
 import config from 'config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -10,12 +11,11 @@ import infoapp from './routes/infoapp';
 import users from './routes/users';
 import { getDb } from './db/mongo';
 
-//TODO: what if config user exists but not at db.
-
 // all CORS requests
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+app.use(helmet());
 
 const http = require('http').createServer(app);
 app.use(express.json());
@@ -51,4 +51,3 @@ async function main() {
 }
 
 main();
-// TODO: export from pet

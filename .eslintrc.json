@@ -55,10 +55,16 @@
         "node/shebang": "off",
         "no-dupe-class-members": "off",
         "require-atomic-updates": "off",
-        "eqeqeq": ["error", "always", {"null": "ignore"}]
+        "eqeqeq": ["error", "always", {"null": "ignore"}],
+        "no-console": 2,
+        // Produce warnings when something is commented as TODO or FIXME
+        "no-warning-comments": [ 1, {
+          "terms": [ "TODO", "FIXME", "XXX" ],
+          "location": "start"
+        }]
       },
       "parserOptions": {
-        "ecmaVersion": 2018,
+        "ecmaVersion": 2022,
         "sourceType": "module"
       }
     }

@@ -16,8 +16,8 @@ describe('snippets delete', () => {
   const chance = new Chance();
   const firstUser = chance.name();
   const secondtUser = chance.name();
-  const firstUserSecret = chance.string({ pool: 'abcdef01234456789' });
-  const secondUserSecret = chance.string({ pool: 'abcdef01234456789' });
+  const firstUserSecret = testGlobals.__STRONG_SECRET__;
+  const secondUserSecret = testGlobals.__SECOND_STRONG_SECRET__;
   const fakeSnippetID = testGlobals.__FAKE_ID__;
 
   beforeAll(async () => {

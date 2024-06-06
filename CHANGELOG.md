@@ -1,5 +1,18 @@
 # Changelog
 
+# [v5.0.0](https://github.com/carvilsi/pwyll/releases/tag/v5.0.0) (2024-06-06)
+
+- added secret policies
+- implemented argon2 to deal with hashes
+
+# [v4.1.0](https://github.com/carvilsi/pwyll/releases/tag/v4.1.0) (2024-04-16)
+
+- upgrading express.js to deal with CVE-2024-29041 vulnerability
+- adding npm command to stop develop mode
+- adding helmet to avoid content headres for hardening
+- not allow user creation with a forbidden username
+- fixes npm package moderate vulnerability
+
 # [v4.0.0](https://github.com/carvilsi/pwyll/releases/tag/v4.0.0) (2024-03-14)
 
 - increassing hashing algorithm to SHA3-512 
