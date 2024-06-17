@@ -36,7 +36,15 @@ module.exports = {
     collections: {
       snippets: 'snippets',
       users: 'users',
+      federation: {
+        snippets: 'federatedSnippets',
+        followers: 'federatedFollowers',
+      },
     },
     limit: 5,
+  },
+  federation: {
+    domain: 'b547-31-221-209-20.ngrok-free.app',
+    account: 'char',
   },
 };
