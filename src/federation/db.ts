@@ -3,7 +3,6 @@ import { getCollection } from '../db/mongo';
 import config from 'config';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
-import { ObjectId } from 'mongodb';
 
 type Follower = {
     actor: string,
@@ -25,8 +24,31 @@ export async function createFollower(
     };
     const insertResult = await collection.insertOne(follower);
     logger.debug('Inserted documents =>', insertResult);
-    // const id: ObjectId = insertResult.insertedId;
   } catch (error) {
+    // TODO: check this error handler, maybe too much pwyll oriented for fedi
     errorControllerHandler(error);
   }
+}
+
+export async function getFollowers(): Promise<Follower[]|undefined> {
+    try {
+        const collectionName = String(config.get('mongodb.collections.federation.followers'));
+        const collection = await getCollection(collectionName);
+        const results = await collection.find().toArray();
+        const followers: Follower[] = [];
+        if (results != null) {
+            for (const result of results) {
+                const follower: Follower = {
+                actor: result.actor,
+                uri: result.uri,
+                createdAt: result.createdAt,
+            };
+            followers.push(follower);
+            }
+        }
+        return followers;
+    } catch (error) {
+        errorControllerHandler(error);
+    } 
+
 }

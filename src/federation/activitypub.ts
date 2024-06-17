@@ -13,7 +13,7 @@ const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
 import { send, verify } from "./handlers";
-import { createFollower } from "./db";
+import { createFollower, getFollowers } from "./db";
 
 // export const activitypub = Router();
 
@@ -41,7 +41,12 @@ import { createFollower } from "./db";
 //   });
 // });
 
-router.post("/:actor/inbox", async (req: express.Request, res: express.Response) => {
+router.post(
+  "/:actor/inbox", 
+  async (
+    req: express.Request, 
+    res: express.Response
+  ) => {
   // const actor: string = req.app.get("actor");
   
   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
@@ -76,6 +81,7 @@ router.post("/:actor/inbox", async (req: express.Request, res: express.Response)
       break;
     }
 
+    // TODO: implement unfollow
     case "Undo": {
       if (body.object.type === "Follow") {
         // deleteFollower({ actor: body.actor, uri: body.object.id });
@@ -100,35 +106,45 @@ router.post("/:actor/inbox", async (req: express.Request, res: express.Response)
   return res.sendStatus(204);
 });
 
-// activitypub.get("/:actor/followers", async (req, res) => {
-//   const actor: string = req.app.get("actor");
+router.get(
+  "/:actor/followers",
+  async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+  if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
-//   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
-//   const page = req.query.page;
+  // TODO: Implement the pagination!
+  const page = req.query.page;
+  
+  const followers = await getFollowers();
 
-//   const followers = listFollowers();
+  if (typeof followers === 'undefined') {
+    res.json();
+  } else {
 
-//   res.contentType("application/activity+json");
+  res.contentType("application/activity+json");
 
-//   if (!page) {
-//     return res.json({
-//       "@context": "https://www.w3.org/ns/activitystreams",
-//       id: `${actor}/followers`,
-//       type: "OrderedCollection",
-//       totalItems: followers.length,
-//       first: `${actor}/followers?page=1`,
-//     });
-//   }
+  if (!page) {
+    return res.json({
+      "@context": "https://www.w3.org/ns/activitystreams",
+      id: `${actor}/followers`,
+      type: "OrderedCollection",
+      totalItems: followers.length,
+      first: `${actor}/followers?page=1`,
+    });
+  }
 
-//   return res.json({
-//     "@context": "https://www.w3.org/ns/activitystreams",
-//     id: `${actor}/followers?page=${page}`,
-//     type: "OrderedCollectionPage",
-//     partOf: `${actor}/followers`,
-//     totalItems: followers.length,
-//     orderedItems: followers.map((follower) => follower.actor),
-//   });
-// });
+  return res.json({
+    "@context": "https://www.w3.org/ns/activitystreams",
+    id: `${actor}/followers?page=${page}`,
+    type: "OrderedCollectionPage",
+    partOf: `${actor}/followers`,
+    totalItems: followers.length,
+    orderedItems: followers.map((follower) => follower.actor),
+  });
+}
+});
 
 // activitypub.get("/:actor/following", async (req, res) => {
 //   const actor: string = req.app.get("actor");
