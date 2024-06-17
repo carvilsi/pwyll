@@ -22,6 +22,8 @@ app.use(helmet());
 app.use(morgan("tiny"));
 
 const http = require('http').createServer(app);
+
+// TODO: run test and remove this thingy
 // app.use(express.json({ 
 //   type: [
 //     "application/json",

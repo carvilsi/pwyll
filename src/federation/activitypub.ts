@@ -13,6 +13,7 @@ const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
 import { send, verify } from "./handlers";
+import { createFollower } from "./db";
 
 // export const activitypub = Router();
 
@@ -71,7 +72,7 @@ router.post("/:actor/inbox", async (req: express.Request, res: express.Response)
         object: body,
       });
       console.log('The follow');
-      // createFollower({ actor: body.actor, uri: body.id });
+      createFollower(body.actor, body.id);
       break;
     }
 
