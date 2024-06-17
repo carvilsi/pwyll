@@ -22,12 +22,26 @@ export async function createFollower(
       uri,
       createdAt: new Date().toISOString(),
     };
-    const insertResult = await collection.insertOne(follower);
+    const insertResult = await collection.updateOne(
+        { actor: actor },
+        { $set: follower },
+        { upsert: true });
     logger.debug('Inserted documents =>', insertResult);
   } catch (error) {
     // TODO: check this error handler, maybe too much pwyll oriented for fedi
     errorControllerHandler(error);
   }
+}
+
+export async function unFollower(actor: string): Promise<void> {
+    try {
+        const collectionName = String(config.get('mongodb.collections.federation.followers'));
+        const collection = await getCollection(collectionName);
+        const deleteResult = await collection.deleteOne({ actor: actor });
+        logger.debug('Deleted follower =>', deleteResult);        
+    } catch (error) {
+        errorControllerHandler(error);
+    }
 }
 
 export async function getFollowers(): Promise<Follower[]|undefined> {

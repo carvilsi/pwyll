@@ -13,9 +13,7 @@ const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
 import { send, verify } from "./handlers";
-import { createFollower, getFollowers } from "./db";
-
-// export const activitypub = Router();
+import { createFollower, getFollowers, unFollower } from "./db";
 
 // activitypub.get("/:actor/outbox", async (req, res) => {
 //   const actor: string = req.app.get("actor");
@@ -67,8 +65,9 @@ router.post(
   // ensure that the verified actor matches the actor in the request body
   if (from !== body.actor) return res.sendStatus(401);
 
-  switch (body.type) {
-    case "Follow": {
+  switch (body.type.toLowerCase()) {
+    // someone following us
+    case "follow": {
       await send(actor, body.actor, {
         "@context": "https://www.w3.org/ns/activitystreams",
         id: `https://${DOMAIN}/${crypto.randomUUID()}`,
@@ -76,31 +75,18 @@ router.post(
         actor,
         object: body,
       });
-      console.log('The follow');
       createFollower(body.actor, body.id);
       break;
     }
 
-    // TODO: implement unfollow
-    case "Undo": {
+    // implement unfollow
+    case "undo": {
       if (body.object.type === "Follow") {
-        // deleteFollower({ actor: body.actor, uri: body.object.id });
+        unFollower(body.actor);
       }
 
       break;
     }
-
-    // case "Accept": {
-    //   if (body.object.type === "Follow") {
-    //     updateFollowing({
-    //       actor: body.actor,
-    //       uri: body.object.id,
-    //       confirmed: true,
-    //     });
-    //   }
-
-    //   break;
-    // }
   }
 
   return res.sendStatus(204);
