@@ -11,8 +11,17 @@ const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
 import { send, verify } from "./handlers";
-import { createFollower, getActivities, getActivity, getFollowers, unFollower } from "./db";
-import { CONTEXT, TO_PUBLIC } from "./utils/fedi.constants";
+import { 
+  createFollower,
+  getActivities, 
+  getActivity, 
+  getFollowers, 
+  unFollower 
+} from "./db";
+import { 
+  CONTEXT, 
+  TO_PUBLIC 
+} from "./utils/fedi.constants";
 
 router.get(
   "/:actor/outbox", 
@@ -42,7 +51,8 @@ router.get(
 
       logger.debug(activityToSend);
       
-      return res.contentType("application/activity+json").json(activityToSend);
+      return res.contentType("application/activity+json")
+        .json(activityToSend);
     }
 });
 
@@ -70,28 +80,32 @@ router.post(
     // ensure that the verified actor matches the actor in the request body
     if (from !== body.actor) return res.sendStatus(401);
 
-    switch (body.type.toLowerCase()) {
-      // someone following us
-      case "follow": {
-        await send(actor, body.actor, {
-          "@context": "https://www.w3.org/ns/activitystreams",
-          id: `https://${DOMAIN}/${crypto.randomUUID()}`,
-          type: "Accept",
-          actor,
-          object: body,
-        });
-        createFollower(body.actor, body.id);
-        break;
-      }
-
-      // implement unfollow
-      case "undo": {
-        if (body.object.type === "Follow") {
-          unFollower(body.actor);
+    try {
+      switch (body.type.toLowerCase()) {
+        // someone following us
+        case "follow": {
+          await send(actor, body.actor, {
+            "@context": "https://www.w3.org/ns/activitystreams",
+            id: `https://${DOMAIN}/${crypto.randomUUID()}`,
+            type: "Accept",
+            actor,
+            object: body,
+          });
+          createFollower(body.actor, body.id);
+          break;
         }
-
-        break;
+  
+        // implement unfollow
+        case "undo": {
+          if (body.object.type === "Follow") {
+            unFollower(body.actor);
+          }
+  
+          break;
+        }
       }
+    } catch (error) {
+      console.dir(error);
     }
 
     return res.sendStatus(204);

@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import express from 'express';
+import fetch from 'node-fetch';
 import { assert } from "superstruct";
 import { Actor } from "./activityPubTypes";
 import { 
@@ -27,9 +28,10 @@ export async function createFediSnippet(
     user: User
 ): Promise<void> {
     const date = new Date();
-    const content = `<p>${user.username} created a snippet:\n` +
-        `"${snippet.description}"\n` +
-        `<strong>${snippet.snippet}</strong></p>`; 
+    const content = 
+        `<p><b>${user.username}</b> created a snippet:</p>` +
+        `<p><i>- ${snippet.description}:</p></i>` +
+        `<p><b>$</b> <code>${snippet.snippet}</code></p>`; 
     const apNote: APNote = {
         type: "Note",
         content: content,
@@ -44,7 +46,7 @@ export async function createFediSnippet(
     };
     
     const noteId = await saveActivityOrNote(apNote);
-    apNote.id = `${actor}/post/${noteId}`;
+    apNote.id = `${actor}/posts/${noteId}`;
 
     const activity: APRoot<APActivity> = {
         ...CONTEXT,
@@ -62,7 +64,7 @@ export async function createFediSnippet(
         for (const follower of followers) {
             await send(actor, follower.actor, {
                 ...activity,
-                id: `${actor}/post/${activityId}`,
+                id: `${actor}/posts/${activityId}`,
                 cc: [ follower.actor ],
             });
         }
@@ -75,18 +77,25 @@ export const PUBLIC_KEY = keypair.publicKey.export({ type: "spki", format: "pem"
 const PRIVATE_KEY = keypair.privateKey.export({ type: "pkcs8", format: "pem" });
 
 /** Fetches and returns an actor at a URL. */
+// TODO: this s giving issues on a mastodon real server
+// maybe we can blame ngrok about the dealy
+// Also maybe swap to another fetch alternative, axios?
 async function fetchActor(url: string) {
-  const res = await fetch(url, {
-    headers: { accept: "application/activity+json" },
-  });
+    console.dir(url);
+    const res = await fetch(url, {
+        headers: { accept: "application/activity+json" },
+    });
 
-  if (res.status < 200 || 299 < res.status)
-    throw new Error(`Received ${res.status} fetching actor.`);
+    console.log('00000000------0000000')
+    console.dir(res);
 
-  const body = await res.json();
-  assert(body, Actor);
+    if (res.status < 200 || 299 < res.status)
+        throw new Error(`Received ${res.status} fetching actor.`);
 
-  return body;
+    const body = await res.json();
+    assert(body, Actor);
+    console.dir(body);
+    return body;
 }
 
 /** Sends a signed message from the sender to the recipient.
