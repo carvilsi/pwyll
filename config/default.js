@@ -44,7 +44,7 @@ module.exports = {
     limit: 5,
   },
   federation: {
-    domain: 'b547-31-221-209-20.ngrok-free.app',
+    domain: '914d-31-221-209-20.ngrok-free.app',
     account: 'char',
   },
 };

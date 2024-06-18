@@ -1,41 +1,72 @@
 import crypto from "node:crypto";
-
-// import type { Request } from "express";
 import express from 'express';
-// import fetch from "node-fetch";
 import { assert } from "superstruct";
 import { Actor } from "./activityPubTypes";
-import { APNote, APObject } from "activitypub-types";
+import { 
+    APActivity, 
+    APNote, 
+    APRoot 
+} from "activitypub-types";
 import config  from "config";
+import { 
+    getFollowers, 
+    saveActivityOrNote 
+} from "./db";
+import { 
+    CONTEXT, 
+    CREATE, 
+    TO_PUBLIC 
+} from "./utils/fedi.constants";
 
 const DOMAIN = config.get('federation.domain');
 const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
-export function createFediSnippet(snippet: Snippet, user: User): void {
+export async function createFediSnippet(
+    snippet: Snippet, 
+    user: User
+): Promise<void> {
     const date = new Date();
     const content = `<p>${user.username} created a snippet:\n` +
         `"${snippet.description}"\n` +
-        `${snippet.snippet}</p>`; 
+        `<strong>${snippet.snippet}</strong></p>`; 
     const apNote: APNote = {
         type: "Note",
         content: content,
         contentMap: {
             en: content,
         },
-        attributedTo: 'todo',
-        to: [
-            'https://www.w3.org/ns/activitystreams#Public'
-        ],
-        cc: [
-            `${actor}/followers`
-        ],
+        // TODO: use the pwyll user
+        attributedTo: actor,
+        to: [ TO_PUBLIC ],
+        cc: [ `${actor}/followers` ],
         published: date.toISOString(),
     };
-    // const apObject: APObject = {
+    
+    const noteId = await saveActivityOrNote(apNote);
+    apNote.id = `${actor}/post/${noteId}`;
 
-    // }
+    const activity: APRoot<APActivity> = {
+        ...CONTEXT,
+        type: CREATE,
+        published: date.toISOString(),
+        actor,
+        to: [ TO_PUBLIC ],
+        cc: [ `${actor}/followers` ],
+        object: apNote,
+    };
 
+    const activityId = await saveActivityOrNote(activity);
+    const followers = await getFollowers();
+    if (followers?.length) {
+        for (const follower of followers) {
+            await send(actor, follower.actor, {
+                ...activity,
+                id: `${actor}/post/${activityId}`,
+                cc: [ follower.actor ],
+            });
+        }
+    }
 }
 
 // TODO: deal with this in cofiguration
@@ -63,9 +94,12 @@ async function fetchActor(url: string) {
  * @param recipient The recipient's actor URL.
  * @param message the body of the request to send.
  */
-export async function send(sender: string, recipient: string, message: object) {
+export async function send(
+    sender: string, 
+    recipient: string, 
+    message: object
+) {
   const url = new URL(recipient);
-
   const actor = await fetchActor(recipient);
   const fragment = actor.inbox.replace("https://" + url.hostname, "");
   const body = JSON.stringify(message);
@@ -107,7 +141,9 @@ export async function send(sender: string, recipient: string, message: object) {
  * Returns the actor's ID if the verification succeeds; throws otherwise.
  * @param req An Express request.
  * @returns The actor's ID. */
-export async function verify(req: express.Request): Promise<string> {
+export async function verify(
+    req: express.Request
+): Promise<string> {
   // get headers included in signature
   const included: Record<string, string> = {};
   for (const header of req.get("signature")?.split(",") ?? []) {
@@ -128,8 +164,6 @@ export async function verify(req: express.Request): Promise<string> {
   /** the signature itself */
   const signature = Buffer.from(included.signature ?? "", "base64");
   if (!signature) throw new Error(`Missing "signature" in signature header.`);
-
-  console.dir(req.body);
 
   // ensure that the digest header matches the digest of the body
   const digestHeader = req.get("digest");

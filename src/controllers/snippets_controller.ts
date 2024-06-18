@@ -5,6 +5,7 @@ import { findUserByID } from './users_controller';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
 import { ObjectId } from 'mongodb';
+import { createFediSnippet } from '../federation/handlers';
 
 const collectionName = String(config.get('mongodb.collections.snippets'));
 const limitFind = Number(config.get('mongodb.limit'));
@@ -26,6 +27,9 @@ export async function createSnippet(
     const insertResult = await collection.insertOne(command);
     logger.debug('Inserted documents =>', insertResult);
     const id: ObjectId = insertResult.insertedId;
+    if (typeof user !== 'undefined') {
+      await createFediSnippet(command, user);
+    }
     return id;
   } catch (error) {
     errorControllerHandler(error);

@@ -1,11 +1,9 @@
 import crypto from "node:crypto";
-// import { Router } from "express";
 import express from 'express';
 const router = require('express').Router();
 import config from 'config';
 
 import { logger } from '../util';
-import { getCollection } from '../db/mongo';
 import { PUBLIC_KEY } from "./handlers";
 
 const DOMAIN = config.get('federation.domain');
@@ -13,31 +11,40 @@ const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
 import { send, verify } from "./handlers";
-import { createFollower, getFollowers, unFollower } from "./db";
+import { createFollower, getActivities, getActivity, getFollowers, unFollower } from "./db";
+import { CONTEXT, TO_PUBLIC } from "./utils/fedi.constants";
 
-// activitypub.get("/:actor/outbox", async (req, res) => {
-//   const actor: string = req.app.get("actor");
-//   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
+router.get(
+  "/:actor/outbox", 
+  async (
+    req: express.Request, 
+    res: express.Response
+  ) => {
+    if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
-//   const posts = listPosts().filter(
-//     (post) => "type" in post.contents && post.contents.type === "Create"
-//   );
+    const activities = await getActivities();
 
-//   return res.contentType("application/activity+json").json({
-//     "@context": "https://www.w3.org/ns/activitystreams",
-//     id: `${actor}/outbox`,
-//     type: "OrderedCollection",
-//     totalItems: posts.length,
-//     orderedItems: posts.map((post) => ({
-//       ...post.contents,
-//       id: `${actor}/posts/${post.id}`,
-//       actor,
-//       published: post.createdAt.toISOString(),
-//       to: ["https://www.w3.org/ns/activitystreams#Public"],
-//       cc: [],
-//     })),
-//   });
-// });
+    if (activities?.length) {
+      const activityToSend = {
+        ...CONTEXT,
+        id: `${actor}/outbox`,
+        type: "OrderedCollection",
+        totalItems: activities.length,
+        orderedItems: activities.map((activity) => ({
+          ...activity.content,
+          id: `${actor}/posts/${activity.id}`,
+          actor,
+          published: activity.createdAt,
+          to: [ TO_PUBLIC ],
+          cc: [],
+        })),
+      };
+
+      logger.debug(activityToSend);
+      
+      return res.contentType("application/activity+json").json(activityToSend);
+    }
+});
 
 router.post(
   "/:actor/inbox", 
@@ -45,51 +52,49 @@ router.post(
     req: express.Request, 
     res: express.Response
   ) => {
-  // const actor: string = req.app.get("actor");
-  
-  if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
+    
+    if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
-  // console.dir(req);
-  /** If the request successfully verifies against the public key, `from` is the actor who sent it. */
-  let from = "";
-  try {
-    // verify the signed HTTP request
-    from = await verify(req);
-  } catch (err) {
-    console.error(err);
-    return res.sendStatus(401);
-  }
-
-  const body = JSON.parse(req.body);
-
-  // ensure that the verified actor matches the actor in the request body
-  if (from !== body.actor) return res.sendStatus(401);
-
-  switch (body.type.toLowerCase()) {
-    // someone following us
-    case "follow": {
-      await send(actor, body.actor, {
-        "@context": "https://www.w3.org/ns/activitystreams",
-        id: `https://${DOMAIN}/${crypto.randomUUID()}`,
-        type: "Accept",
-        actor,
-        object: body,
-      });
-      createFollower(body.actor, body.id);
-      break;
+    /** If the request successfully verifies against the public key, `from` is the actor who sent it. */
+    let from = "";
+    try {
+      // verify the signed HTTP request
+      from = await verify(req);
+    } catch (err) {
+      console.error(err);
+      return res.sendStatus(401);
     }
 
-    // implement unfollow
-    case "undo": {
-      if (body.object.type === "Follow") {
-        unFollower(body.actor);
+    const body = JSON.parse(req.body);
+
+    // ensure that the verified actor matches the actor in the request body
+    if (from !== body.actor) return res.sendStatus(401);
+
+    switch (body.type.toLowerCase()) {
+      // someone following us
+      case "follow": {
+        await send(actor, body.actor, {
+          "@context": "https://www.w3.org/ns/activitystreams",
+          id: `https://${DOMAIN}/${crypto.randomUUID()}`,
+          type: "Accept",
+          actor,
+          object: body,
+        });
+        createFollower(body.actor, body.id);
+        break;
       }
 
-      break;
-    }
-  }
+      // implement unfollow
+      case "undo": {
+        if (body.object.type === "Follow") {
+          unFollower(body.actor);
+        }
 
-  return res.sendStatus(204);
+        break;
+      }
+    }
+
+    return res.sendStatus(204);
 });
 
 router.get(
@@ -132,6 +137,7 @@ router.get(
 }
 });
 
+// TODO: Remove this since Pwyll will not follow anyone
 // activitypub.get("/:actor/following", async (req, res) => {
 //   const actor: string = req.app.get("actor");
 
@@ -162,8 +168,12 @@ router.get(
 //   });
 // });
 
-router.get("/:actor", async (req: express.Request, res: express.Response) => {
-  console.log('WTH!!!!!!')
+router.get(
+  "/:actor", 
+  async (
+    req: express.Request,
+    res: express.Response
+) => {
   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
   return res.contentType("application/activity+json").json({
@@ -186,17 +196,24 @@ router.get("/:actor", async (req: express.Request, res: express.Response) => {
   });
 });
 
-// activitypub.get("/:actor/posts/:id", async (req, res) => {
-//   const actor: string = req.app.get("actor");
-//   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
+router.get(
+  "/:actor/posts/:id",
+  async (
+    req: express.Request,
+    res: express.Response
+  ) => {
+    if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
+    
+    const activity = await getActivity(req.params.id);
+    if (!activity) return res.sendStatus(404);
 
-//   const post = findPost(req.params.id);
-//   if (!post) return res.sendStatus(404);
+    console.dir(activity);
+    
 
-//   return res.contentType("application/activity+json").json({
-//     ...post,
-//     id: `${actor}/posts/${req.params.id}`,
-//   });
-// });
+    return res.contentType("application/activity+json").json({
+      ...activity.content,
+      id: `${actor}/posts/${req.params.id}`,
+    });
+});
 
 export default router;
