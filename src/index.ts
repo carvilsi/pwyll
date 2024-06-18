@@ -13,6 +13,7 @@ import users from './routes/users';
 import { getDb } from './db/mongo';
 import webfinger from './federation/webfinger';
 import activitypub from './federation/activitypub';
+import { APP_ACTV_JSON } from './federation/utils/fedi.constants';
 
 // all CORS requests
 const app = express();
@@ -27,7 +28,7 @@ const http = require('http').createServer(app);
 // app.use(express.json({ 
 //   type: [
 //     "application/json",
-//     "application/activity+json"
+//     APP_ACTV_JSON
 //   ]
 // }));
 
@@ -35,7 +36,7 @@ app.use(
   express.text({ 
     type: [
       "application/json",
-      "application/activity+json"
+      APP_ACTV_JSON
     ]
   })
 );

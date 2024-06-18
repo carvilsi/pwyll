@@ -11,17 +11,6 @@ import {
 } from 'activitypub-types';
 import { CREATE } from './utils/fedi.constants';
 
-type Follower = {
-    actor: string,
-    uri: string,
-    createdAt: string,
-}
-
-type ActivityOrNote = {
-    content: object,
-    createdAt: string,
-}
-
 export async function createFollower(
   actor: string,
   uri: string,
@@ -76,12 +65,6 @@ export async function unFollower(actor: string): Promise<void> {
     } catch (error) {
         errorControllerHandler(error);
     }
-}
-
-type Activity = {
-    id: ObjectId,
-    content: APRoot<APActivity>,
-    createdAt: string,
 }
 
 export async function getActivities(): Promise<Activity[]|undefined> {

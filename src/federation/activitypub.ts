@@ -1,30 +1,35 @@
-import crypto from "node:crypto";
+import crypto from 'node:crypto';
 import express from 'express';
 const router = require('express').Router();
 import config from 'config';
 
 import { logger } from '../util';
-import { PUBLIC_KEY } from "./handlers";
+import { PUBLIC_KEY } from './handlers';
 
 const DOMAIN = config.get('federation.domain');
 const ACCOUNT = config.get('federation.account');
 const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
 
-import { send, verify } from "./handlers";
+import { 
+  send, 
+  verify 
+} from './handlers';
 import { 
   createFollower,
   getActivities, 
   getActivity, 
   getFollowers, 
   unFollower 
-} from "./db";
+} from './db';
 import { 
+  APP_ACTV_JSON,
   CONTEXT, 
+  CONTEXT_SEC, 
   TO_PUBLIC 
-} from "./utils/fedi.constants";
+} from './utils/fedi.constants';
 
 router.get(
-  "/:actor/outbox", 
+  '/:actor/outbox', 
   async (
     req: express.Request, 
     res: express.Response
@@ -37,7 +42,7 @@ router.get(
       const activityToSend = {
         ...CONTEXT,
         id: `${actor}/outbox`,
-        type: "OrderedCollection",
+        type: 'OrderedCollection',
         totalItems: activities.length,
         orderedItems: activities.map((activity) => ({
           ...activity.content,
@@ -51,13 +56,13 @@ router.get(
 
       logger.debug(activityToSend);
       
-      return res.contentType("application/activity+json")
+      return res.contentType(APP_ACTV_JSON)
         .json(activityToSend);
     }
 });
 
 router.post(
-  "/:actor/inbox", 
+  '/:actor/inbox', 
   async (
     req: express.Request, 
     res: express.Response
@@ -66,12 +71,12 @@ router.post(
     if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
     /** If the request successfully verifies against the public key, `from` is the actor who sent it. */
-    let from = "";
+    let from = '';
     try {
       // verify the signed HTTP request
       from = await verify(req);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       return res.sendStatus(401);
     }
 
@@ -83,11 +88,11 @@ router.post(
     try {
       switch (body.type.toLowerCase()) {
         // someone following us
-        case "follow": {
+        case 'follow': {
           await send(actor, body.actor, {
-            "@context": "https://www.w3.org/ns/activitystreams",
+            ...CONTEXT,
             id: `https://${DOMAIN}/${crypto.randomUUID()}`,
-            type: "Accept",
+            type: 'Accept',
             actor,
             object: body,
           });
@@ -96,8 +101,8 @@ router.post(
         }
   
         // implement unfollow
-        case "undo": {
-          if (body.object.type === "Follow") {
+        case 'undo': {
+          if (body.object.type === 'Follow') {
             unFollower(body.actor);
           }
   
@@ -105,14 +110,14 @@ router.post(
         }
       }
     } catch (error) {
-      console.dir(error);
+      logger.error(error);
     }
 
     return res.sendStatus(204);
 });
 
 router.get(
-  "/:actor/followers",
+  '/:actor/followers',
   async (
     req: express.Request,
     res: express.Response
@@ -128,22 +133,22 @@ router.get(
     res.json();
   } else {
 
-  res.contentType("application/activity+json");
+  res.contentType(APP_ACTV_JSON);
 
   if (!page) {
     return res.json({
-      "@context": "https://www.w3.org/ns/activitystreams",
+      ...CONTEXT,
       id: `${actor}/followers`,
-      type: "OrderedCollection",
+      type: 'OrderedCollection',
       totalItems: followers.length,
       first: `${actor}/followers?page=1`,
     });
   }
 
   return res.json({
-    "@context": "https://www.w3.org/ns/activitystreams",
+    ...CONTEXT,
     id: `${actor}/followers?page=${page}`,
-    type: "OrderedCollectionPage",
+    type: 'OrderedCollectionPage',
     partOf: `${actor}/followers`,
     totalItems: followers.length,
     orderedItems: followers.map((follower) => follower.actor),
@@ -152,30 +157,30 @@ router.get(
 });
 
 // TODO: Remove this since Pwyll will not follow anyone
-// activitypub.get("/:actor/following", async (req, res) => {
-//   const actor: string = req.app.get("actor");
+// activitypub.get('/:actor/following', async (req, res) => {
+//   const actor: string = req.app.get('actor');
 
 //   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 //   const page = req.query.page;
 
 //   const following = listFollowing();
 
-//   res.contentType("application/activity+json");
+//   res.contentType(APP_ACTV_JSON);
 
 //   if (!page) {
 //     return res.json({
-//       "@context": "https://www.w3.org/ns/activitystreams",
+//       '@context': 'https://www.w3.org/ns/activitystreams',
 //       id: `${actor}/following`,
-//       type: "OrderedCollection",
+//       type: 'OrderedCollection',
 //       totalItems: following.length,
 //       first: `${actor}/following?page=1`,
 //     });
 //   }
 
 //   return res.json({
-//     "@context": "https://www.w3.org/ns/activitystreams",
+//     '@context': 'https://www.w3.org/ns/activitystreams',
 //     id: `${actor}/following?page=${page}`,
-//     type: "OrderedCollectionPage",
+//     type: 'OrderedCollectionPage',
 //     partOf: `${actor}/following`,
 //     totalItems: following.length,
 //     orderedItems: following.map((follow) => follow.actor),
@@ -183,20 +188,17 @@ router.get(
 // });
 
 router.get(
-  "/:actor", 
+  '/:actor', 
   async (
     req: express.Request,
     res: express.Response
 ) => {
   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
-  return res.contentType("application/activity+json").json({
-    "@context": [
-      "https://www.w3.org/ns/activitystreams",
-      "https://w3id.org/security/v1",
-    ],
+  return res.contentType(APP_ACTV_JSON).json({
+    ...CONTEXT_SEC,
     id: actor,
-    type: "Person",
+    type: 'Person',
     preferredUsername: ACCOUNT,
     inbox: `${actor}/inbox`,
     outbox: `${actor}/outbox`,
@@ -211,7 +213,7 @@ router.get(
 });
 
 router.get(
-  "/:actor/posts/:id",
+  '/:actor/posts/:id',
   async (
     req: express.Request,
     res: express.Response
@@ -221,10 +223,7 @@ router.get(
     const activity = await getActivity(req.params.id);
     if (!activity) return res.sendStatus(404);
 
-    console.dir(activity);
-    
-
-    return res.contentType("application/activity+json").json({
+    return res.contentType(APP_ACTV_JSON).json({
       ...activity.content,
       id: `${actor}/posts/${req.params.id}`,
     });

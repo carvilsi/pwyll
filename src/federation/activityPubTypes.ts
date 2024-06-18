@@ -4,7 +4,7 @@ import {
     optional, 
     string, 
     type 
-} from "superstruct";
+} from 'superstruct';
 
 export const Object = type({
   id: string(),
