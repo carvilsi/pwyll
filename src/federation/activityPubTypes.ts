@@ -1,10 +1,4 @@
-import { 
-    array, 
-    assign, 
-    optional, 
-    string, 
-    type 
-} from 'superstruct';
+import { array, assign, optional, string, type } from 'superstruct';
 
 export const Object = type({
   id: string(),
@@ -25,17 +19,17 @@ export const Actor = assign(
     endpoints: optional(
       type({
         sharedInbox: optional(string()),
-      }),
+      })
     ),
     publicKey: optional(
       type({
         publicKeyPem: string(),
-      }),
+      })
     ),
   })
 );
 
 export const Activity = assign(
   Object,
-  type({ actor: string(), object: Object }),
+  type({ actor: string(), object: Object })
 );

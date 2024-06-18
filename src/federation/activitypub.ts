@@ -8,32 +8,25 @@ import { PUBLIC_KEY } from './handlers';
 
 const DOMAIN = config.get('federation.domain');
 const ACCOUNT = config.get('federation.account');
-const actor: string = `https://${DOMAIN}/${ACCOUNT}`;
+const actor = `https://${DOMAIN}/${ACCOUNT}`;
 
-import { 
-  send, 
-  verify 
-} from './handlers';
-import { 
-  createFollower,
-  getActivities, 
-  getActivity, 
-  getFollowers, 
-  unFollower 
-} from './db';
-import { 
+import { send, verify } from './handlers';
+import {
   APP_ACTV_JSON,
-  CONTEXT, 
-  CONTEXT_SEC, 
-  TO_PUBLIC 
+  CONTEXT,
+  CONTEXT_SEC,
+  TO_PUBLIC,
 } from './utils/fedi.constants';
+import { getActivities, getActivity } from './db/activity_controller';
+import {
+  createFollower,
+  getFollowers,
+  unFollower,
+} from './db/followers_controller';
 
 router.get(
-  '/:actor/outbox', 
-  async (
-    req: express.Request, 
-    res: express.Response
-  ) => {
+  '/:actor/outbox',
+  async (req: express.Request, res: express.Response) => {
     if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
     const activities = await getActivities();
@@ -44,30 +37,26 @@ router.get(
         id: `${actor}/outbox`,
         type: 'OrderedCollection',
         totalItems: activities.length,
-        orderedItems: activities.map((activity) => ({
+        orderedItems: activities.map(activity => ({
           ...activity.content,
           id: `${actor}/posts/${activity.id}`,
           actor,
           published: activity.createdAt,
-          to: [ TO_PUBLIC ],
+          to: [TO_PUBLIC],
           cc: [],
         })),
       };
 
       logger.debug(activityToSend);
-      
-      return res.contentType(APP_ACTV_JSON)
-        .json(activityToSend);
+
+      return res.contentType(APP_ACTV_JSON).json(activityToSend);
     }
-});
+  }
+);
 
 router.post(
-  '/:actor/inbox', 
-  async (
-    req: express.Request, 
-    res: express.Response
-  ) => {
-    
+  '/:actor/inbox',
+  async (req: express.Request, res: express.Response) => {
     if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
     /** If the request successfully verifies against the public key, `from` is the actor who sent it. */
@@ -99,13 +88,13 @@ router.post(
           createFollower(body.actor, body.id);
           break;
         }
-  
+
         // implement unfollow
         case 'undo': {
           if (body.object.type === 'Follow') {
             unFollower(body.actor);
           }
-  
+
           break;
         }
       }
@@ -114,47 +103,45 @@ router.post(
     }
 
     return res.sendStatus(204);
-});
+  }
+);
 
 router.get(
   '/:actor/followers',
-  async (
-    req: express.Request,
-    res: express.Response
-  ) => {
-  if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
+  async (req: express.Request, res: express.Response) => {
+    if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
-  // TODO: Implement the pagination!
-  const page = req.query.page;
-  
-  const followers = await getFollowers();
+    // TODO: Implement the pagination!
+    const page = req.query.page;
 
-  if (typeof followers === 'undefined') {
-    res.json();
-  } else {
+    const followers = await getFollowers();
 
-  res.contentType(APP_ACTV_JSON);
+    if (typeof followers === 'undefined') {
+      res.json();
+    } else {
+      res.contentType(APP_ACTV_JSON);
 
-  if (!page) {
-    return res.json({
-      ...CONTEXT,
-      id: `${actor}/followers`,
-      type: 'OrderedCollection',
-      totalItems: followers.length,
-      first: `${actor}/followers?page=1`,
-    });
+      if (!page) {
+        return res.json({
+          ...CONTEXT,
+          id: `${actor}/followers`,
+          type: 'OrderedCollection',
+          totalItems: followers.length,
+          first: `${actor}/followers?page=1`,
+        });
+      }
+
+      return res.json({
+        ...CONTEXT,
+        id: `${actor}/followers?page=${page}`,
+        type: 'OrderedCollectionPage',
+        partOf: `${actor}/followers`,
+        totalItems: followers.length,
+        orderedItems: followers.map(follower => follower.actor),
+      });
+    }
   }
-
-  return res.json({
-    ...CONTEXT,
-    id: `${actor}/followers?page=${page}`,
-    type: 'OrderedCollectionPage',
-    partOf: `${actor}/followers`,
-    totalItems: followers.length,
-    orderedItems: followers.map((follower) => follower.actor),
-  });
-}
-});
+);
 
 // TODO: Remove this since Pwyll will not follow anyone
 // activitypub.get('/:actor/following', async (req, res) => {
@@ -187,12 +174,7 @@ router.get(
 //   });
 // });
 
-router.get(
-  '/:actor', 
-  async (
-    req: express.Request,
-    res: express.Response
-) => {
+router.get('/:actor', async (req: express.Request, res: express.Response) => {
   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
 
   return res.contentType(APP_ACTV_JSON).json({
@@ -214,12 +196,9 @@ router.get(
 
 router.get(
   '/:actor/posts/:id',
-  async (
-    req: express.Request,
-    res: express.Response
-  ) => {
+  async (req: express.Request, res: express.Response) => {
     if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
-    
+
     const activity = await getActivity(req.params.id);
     if (!activity) return res.sendStatus(404);
 
@@ -227,6 +206,7 @@ router.get(
       ...activity.content,
       id: `${actor}/posts/${req.params.id}`,
     });
-});
+  }
+);
 
 export default router;

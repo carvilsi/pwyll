@@ -20,12 +20,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(helmet());
-app.use(morgan("tiny"));
+app.use(morgan('tiny'));
 
 const http = require('http').createServer(app);
 
 // TODO: run test and remove this thingy
-// app.use(express.json({ 
+// app.use(express.json({
 //   type: [
 //     "application/json",
 //     APP_ACTV_JSON
@@ -33,11 +33,8 @@ const http = require('http').createServer(app);
 // }));
 
 app.use(
-  express.text({ 
-    type: [
-      "application/json",
-      APP_ACTV_JSON
-    ]
+  express.text({
+    type: ['application/json', APP_ACTV_JSON],
   })
 );
 
