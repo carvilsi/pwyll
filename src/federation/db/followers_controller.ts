@@ -3,14 +3,15 @@ import { getCollection } from '../../db/mongo';
 import config from 'config';
 import { errorControllerHandler } from '../../errorHandlers';
 
+const collectionName = String(
+    config.get('mongodb.collections.federation.followers'));
+
 export async function createFollower(
   actor: string,
   uri: string
 ): Promise<void> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
+    
     const collection = await getCollection(collectionName);
     const follower: Follower = {
       actor,
@@ -31,9 +32,6 @@ export async function createFollower(
 
 export async function getFollowers(): Promise<Follower[] | undefined> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
     const collection = await getCollection(collectionName);
     const results = await collection.find().toArray();
     const followers: Follower[] = [];
@@ -55,9 +53,6 @@ export async function getFollowers(): Promise<Follower[] | undefined> {
 
 export async function unFollower(actor: string): Promise<void> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
     const collection = await getCollection(collectionName);
     const deleteResult = await collection.deleteOne({ actor: actor });
     logger.debug('Deleted follower =>', deleteResult);

@@ -6,13 +6,13 @@ import { ObjectId } from 'mongodb';
 import { APActivity, APNote, APRoot } from 'activitypub-types';
 import { CREATE } from '../utils/fedi.constants';
 
+const collectionName = String(
+    config.get('mongodb.collections.federation.snippets'));
+
 export async function saveActivityOrNote(
   activityOrNote: APNote | APRoot<APActivity>
 ): Promise<ObjectId | undefined> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.snippets')
-    );
     const collection = await getCollection(collectionName);
     const actOrNote: ActivityOrNote = {
       content: activityOrNote,
@@ -29,9 +29,6 @@ export async function saveActivityOrNote(
 
 export async function getActivities(): Promise<Activity[] | undefined> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.snippets')
-    );
     const collection = await getCollection(collectionName);
     const results = await collection.find({ 'content.type': CREATE }).toArray();
     const activities: Activity[] = [];
@@ -53,9 +50,6 @@ export async function getActivities(): Promise<Activity[] | undefined> {
 
 export async function getActivity(id: string): Promise<Activity | undefined> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.snippets')
-    );
     const collection = await getCollection(collectionName);
     const _id: ObjectId = new ObjectId(id);
     const result = await collection.findOne({ _id });

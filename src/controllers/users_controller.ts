@@ -26,6 +26,23 @@ export async function createUser(
   }
 }
 
+export async function getUsers(): Promise<User[] | undefined> {
+  try {
+    const collection = await getCollection(collectionName);
+    const users: User[] = [];
+    const results = await collection.find().toArray();
+    for (const result of results) {
+      const user: User = {
+        username: result.username,
+      }
+      users.push(user);
+    }
+    return users;
+  } catch (error) {
+    errorControllerHandler(error);
+  }
+}
+
 export async function findUserByID(
   userID: string,
   secret?: string

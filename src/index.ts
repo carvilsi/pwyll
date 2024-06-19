@@ -24,17 +24,12 @@ app.use(morgan('tiny'));
 
 const http = require('http').createServer(app);
 
-// TODO: run test and remove this thingy
-// app.use(express.json({
-//   type: [
-//     "application/json",
-//     APP_ACTV_JSON
-//   ]
-// }));
-
 app.use(
   express.text({
-    type: ['application/json', APP_ACTV_JSON],
+    type: [
+      'application/json', 
+      APP_ACTV_JSON
+    ],
   })
 );
 
