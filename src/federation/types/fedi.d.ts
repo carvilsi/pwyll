@@ -14,3 +14,9 @@ type Activity = {
   content: APRoot<APActivity>;
   createdAt: string;
 };
+
+type UserResource = {
+  username: string,
+  resource: string,
+  actor: string,
+}

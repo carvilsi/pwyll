@@ -28,6 +28,7 @@ export async function createSnippet(
     logger.debug('Inserted documents =>', insertResult);
     const id: ObjectId = insertResult.insertedId;
     if (typeof user !== 'undefined') {
+      console.log('LoL----LLLLL-----LLLLLLL');
       await createFediSnippet(command, user);
     }
     return id;
