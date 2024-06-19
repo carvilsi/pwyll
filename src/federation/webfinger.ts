@@ -52,7 +52,7 @@ router.get(
           {
             rel: 'self',
             type: APP_ACTV_JSON,
-            href: resourceExists.resource,
+            href: resourceExists.actor,
           },
         ],
       });
