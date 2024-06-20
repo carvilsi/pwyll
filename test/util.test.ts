@@ -14,7 +14,7 @@ const Chance = require('chance');
 
 describe('utils', () => {
   const chance = new Chance();
-  const firstUser = chance.name();
+  const firstUser = chance.name().replace(' ', '_');
   const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {

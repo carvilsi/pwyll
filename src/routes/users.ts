@@ -27,7 +27,7 @@ router.post(
   ) => {
     try {
       paramCheck(req, ['username', 'secret']);
-      const username = req.body.username;
+      const username = req.body.username.trim();
       const secret = req.body.secret;
       userLengthCheck(username);
       forbiddenNameCheck(username);

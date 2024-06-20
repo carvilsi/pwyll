@@ -44,6 +44,7 @@ module.exports = {
     limit: 5,
   },
   federation: {
+    // change this with your domain
     domain: 'c30c-31-221-188-65.ngrok-free.app',
   },
 };

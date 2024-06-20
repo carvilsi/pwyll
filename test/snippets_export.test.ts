@@ -17,7 +17,7 @@ describe('snippets export', () => {
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
   const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
-  const firstUsername = chance.name();
+  const firstUsername = chance.name().replace(' ', '_');
   const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {

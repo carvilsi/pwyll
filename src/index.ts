@@ -1,5 +1,3 @@
-// TODO: remove this
-/* eslint no-console:off */
 import express from 'express';
 import helmet from 'helmet';
 import config from 'config';
@@ -67,7 +65,6 @@ async function main() {
         for (const userResource of usersResources) {
           const fediUser = userResource.fediUser;
           logger.info(fediUser);
-          console.log(fediUser);
         }
       }
     });

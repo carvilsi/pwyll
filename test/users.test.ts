@@ -21,7 +21,7 @@ async function createUser(
 
 describe('users ', () => {
   const chance = new Chance();
-  const name = chance.name();
+  const name = chance.name().replace(' ', '_');
 
   test('should create a user', async () => {
     const res = await createUser(name, testGlobals.__STRONG_SECRET__);
@@ -38,7 +38,7 @@ describe('users ', () => {
   test('should not allow creating an existing user', async () => {
     const res = await createUser(name, testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(500);
-    expect(res.text).toMatch(/already exists, please choose a different/);
+    expect(res.text).toMatch(/already exists, please choose a different one/);
   });
 
   test('should not allow creating users with forbidden names', async () => {
@@ -50,7 +50,7 @@ describe('users ', () => {
       );
       expect(res.statusCode).toBe(500);
       expect(res.text).toMatch(
-        /is a forbidden name, please choose a different/
+        /is a forbidden name, please choose a different one/
       );
     }
   });
@@ -82,14 +82,29 @@ describe('users ', () => {
     expect(res.text).toMatch(/Provide a user name/);
   });
 
+  test('should not allow creating a user with a space character', async () => {
+    const res = await createUser('Frodo Bolson', testGlobals.__STRONG_SECRET__);
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Space characters not allowed for user name/);
+  });
+
+  test('should not allow creating a user with a space characters', async () => {
+    const res = await createUser(
+      'Frodo  Bolson',
+      testGlobals.__STRONG_SECRET__
+    );
+    expect(res.statusCode).toBe(500);
+    expect(res.text).toMatch(/Space characters not allowed for user name/);
+  });
+
   test('should not allow creating a user with empty secret', async () => {
-    const res = await createUser(chance.name(), '');
+    const res = await createUser(chance.name().replace(' ', '_'), '');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a secret/);
   });
 
   test('should not allow creating a user with blank secret', async () => {
-    const res = await createUser(chance.name(), '     ');
+    const res = await createUser(chance.name().replace(' ', '_'), '     ');
     expect(res.statusCode).toBe(500);
     expect(res.text).toMatch(/Provide a secret/);
   });

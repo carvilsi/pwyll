@@ -19,7 +19,8 @@ export function userLengthCheck(username: string): boolean {
 
 export function forbiddenNameCheck(username: string): boolean {
   if (forbiddenUserNames.includes(username.toLocaleLowerCase()))
-    throw `${username} is a forbidden name, please choose a different`;
+    throw `${username} is a forbidden name, please choose a different one`;
+  if (/\s/.test(username)) throw 'Space characters not allowed for user name';
   return true;
 }
 

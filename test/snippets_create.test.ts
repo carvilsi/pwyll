@@ -12,8 +12,8 @@ describe('snippets create', () => {
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
   const secondSnippetObj = testGlobals.__SECOND_SNIPPET_OBJECT__;
   const chance = new Chance();
-  const firstUser = chance.name();
-  const secondtUser = chance.name();
+  const firstUser = chance.name().replace(' ', '_');
+  const secondtUser = chance.name().replace(' ', '_');
   const firstUserSecret = testGlobals.__STRONG_SECRET__;
   const secondUserSecret = testGlobals.__SECOND_STRONG_SECRET__;
 
