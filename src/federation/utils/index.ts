@@ -2,6 +2,9 @@ import config from 'config';
 import { getUsers } from '../../controllers/users_controller';
 import express from 'express';
 import { logger } from '../../util';
+import { unFollower } from '../db/followers_controller';
+import { getPwyllSnippetByActivityId } from '../db/activity_controller';
+import { subtractLike } from '../../controllers/snippets_controller';
 
 const DOMAIN = String(config.get('federation.domain'));
 
@@ -67,4 +70,31 @@ export async function userExists(
   }
   logger.debug('requested actor doees not exists');
   res.sendStatus(404);
+}
+
+export async function undoActionHandler(
+  undoAction: UndoAction,
+  ur: UserResource
+): Promise<void> {
+  switch (undoAction.type.toLocaleLowerCase()) {
+    // implement unfollow
+    case 'follow': {
+      logger.debug(`A undo ${undoAction.type} action`);
+      await unFollower(undoAction.actor, ur);
+      break;
+    }
+    // implement unlike
+    case 'like': {
+      logger.debug(`A undo ${undoAction.type} action`);
+      const pwyllSnippetId = await getPwyllSnippetByActivityId(
+        undoAction.postId
+      );
+      if (typeof pwyllSnippetId !== 'undefined') {
+        await subtractLike(pwyllSnippetId);
+      }
+      break;
+    }
+    default:
+      break;
+  }
 }

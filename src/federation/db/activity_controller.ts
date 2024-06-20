@@ -11,13 +11,15 @@ const collectionName = String(
 );
 
 export async function saveActivityOrNote(
-  activityOrNote: APNote | APRoot<APActivity>
+  activityOrNote: APNote | APRoot<APActivity>,
+  snippetId: ObjectId
 ): Promise<ObjectId | undefined> {
   try {
     const collection = await getCollection(collectionName);
     const actOrNote: ActivityOrNote = {
       content: activityOrNote,
       createdAt: new Date().toISOString(),
+      snippetId,
     };
     const insertResult = await collection.insertOne(actOrNote);
     logger.debug('Inserted activity or note', insertResult);
@@ -61,6 +63,22 @@ export async function getActivity(id: string): Promise<Activity | undefined> {
         createdAt: result.createdAt,
       };
       return activity;
+    }
+  } catch (error) {
+    errorControllerHandler(error);
+  }
+}
+
+export async function getPwyllSnippetByActivityId(
+  id: string
+): Promise<ObjectId | undefined> {
+  try {
+    const collection = await getCollection(collectionName);
+    const result = await collection.findOne({
+      'content.object.id': id,
+    });
+    if (result != null) {
+      return result.snippetId;
     }
   } catch (error) {
     errorControllerHandler(error);

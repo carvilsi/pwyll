@@ -4,6 +4,7 @@ type Snippet = {
   _id?: ObjectId;
   user?: User;
   username?: string;
+  likes?: number;
 };
 
 type User = {

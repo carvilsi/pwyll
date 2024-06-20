@@ -28,7 +28,7 @@ export async function createSnippet(
     logger.debug('Inserted documents =>', insertResult);
     const id: ObjectId = insertResult.insertedId;
     if (typeof user !== 'undefined') {
-      await createFediSnippet(command, user);
+      await createFediSnippet(command, user, id);
     }
     return id;
   } catch (error) {
@@ -222,5 +222,29 @@ export async function updateSnippet(
     }
   } catch (error) {
     errorControllerHandler(error);
+  }
+}
+
+export async function addLike(id: ObjectId): Promise<void> {
+  const collection = await getCollection(collectionName);
+  const result = await collection.findOne({ _id: id });
+  if (result !== null) {
+    let likes = result.likes ?? 0;
+    likes += 1;
+    await collection.updateOne({ _id: id }, { $set: { likes: likes } });
+  }
+}
+
+export async function subtractLike(id: ObjectId): Promise<void> {
+  const collection = await getCollection(collectionName);
+  const result = await collection.findOne({ _id: id });
+  if (result !== null) {
+    let likes = result.likes ?? 0;
+    if (likes === 0) {
+      return;
+    } else {
+      likes -= 1;
+      await collection.updateOne({ _id: id }, { $set: { likes: likes } });
+    }
   }
 }

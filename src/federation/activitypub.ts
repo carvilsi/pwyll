@@ -15,13 +15,14 @@ import {
   CONTEXT_SEC,
   TO_PUBLIC,
 } from './utils/fedi.constants';
-import { getActivities, getActivity } from './db/activity_controller';
 import {
-  createFollower,
-  getFollowers,
-  unFollower,
-} from './db/followers_controller';
-import { userExists } from './utils';
+  getActivities,
+  getActivity,
+  getPwyllSnippetByActivityId,
+} from './db/activity_controller';
+import { createFollower, getFollowers } from './db/followers_controller';
+import { undoActionHandler, userExists } from './utils';
+import { addLike } from '../controllers/snippets_controller';
 
 router.get(
   '/:actor/outbox',
@@ -83,6 +84,7 @@ router.post(
       if (from !== body.actor) return res.sendStatus(401);
 
       try {
+        logger.debug(`the fedi action: ${body.type.toLowerCase()}`);
         switch (body.type.toLowerCase()) {
           // someone following us
           case 'follow': {
@@ -97,12 +99,25 @@ router.post(
             break;
           }
 
-          // implement unfollow
+          // action related with undo
           case 'undo': {
-            if (body.object.type === 'Follow') {
-              unFollower(body.actor, ur);
-            }
+            const undoAction: UndoAction = {
+              actor: body.actor,
+              type: body.object.type,
+              postId: body.object.object,
+            };
+            await undoActionHandler(undoAction, ur);
+            break;
+          }
 
+          // implementing the like action
+          case 'like': {
+            const pwyllSnippetId = await getPwyllSnippetByActivityId(
+              body.object
+            );
+            if (typeof pwyllSnippetId !== 'undefined') {
+              await addLike(pwyllSnippetId);
+            }
             break;
           }
         }

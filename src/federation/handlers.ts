@@ -14,10 +14,12 @@ import { saveActivityOrNote } from './db/activity_controller';
 import { getFollowers } from './db/followers_controller';
 import { getUserResource } from './utils';
 import { logger } from '../util';
+import { ObjectId } from 'mongodb';
 
 export async function createFediSnippet(
   snippet: Snippet,
-  user: User
+  user: User,
+  snippetId: ObjectId
 ): Promise<void> {
   const userResource = await getUserResource(user);
   if (typeof userResource !== 'undefined') {
@@ -27,6 +29,7 @@ export async function createFediSnippet(
       `<p>Pwyll user <b>${user.username}</b> created a new snippet:</p>` +
       `<p>-<i> ${snippet.description}</i>:\n` +
       `<b>$</b> <code>${snippet.snippet}</code></p>`;
+
     const apNote: APNote = {
       type: 'Note',
       content: content,
@@ -39,7 +42,7 @@ export async function createFediSnippet(
       published: date.toISOString(),
     };
 
-    const noteId = await saveActivityOrNote(apNote);
+    const noteId = await saveActivityOrNote(apNote, snippetId);
     apNote.id = `${actor}/posts/${noteId}`;
 
     const activity: APRoot<APActivity> = {
@@ -52,7 +55,7 @@ export async function createFediSnippet(
       object: apNote,
     };
 
-    const activityId = await saveActivityOrNote(activity);
+    const activityId = await saveActivityOrNote(activity, snippetId);
     const followers = await getFollowers(userResource.pwyllUserId);
     if (followers?.length) {
       for (const follower of followers) {

@@ -13,6 +13,7 @@ type Follower = {
 type ActivityOrNote = {
   content: object;
   createdAt: string;
+  snippetId: ObjectId;
 };
 
 type Activity = {
@@ -27,4 +28,10 @@ type UserResource = {
   actor: string;
   pwyllUserId: ObjectId;
   fediUser: string;
+};
+
+type UndoAction = {
+  actor: string;
+  type: string;
+  postId: string;
 };
