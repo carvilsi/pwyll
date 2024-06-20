@@ -34,7 +34,8 @@ export async function getUsers(): Promise<User[] | undefined> {
     for (const result of results) {
       const user: User = {
         username: result.username,
-      }
+        _id: result._id,
+      };
       users.push(user);
     }
     return users;

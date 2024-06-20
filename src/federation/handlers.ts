@@ -3,11 +3,7 @@ import express from 'express';
 import fetch from 'node-fetch';
 import { assert } from 'superstruct';
 import { Actor } from './types/activityPubTypes';
-import { 
-  APActivity, 
-  APNote, 
-  APRoot 
-} from 'activitypub-types';
+import { APActivity, APNote, APRoot } from 'activitypub-types';
 import {
   APP_ACTV_JSON,
   CONTEXT,
@@ -25,13 +21,10 @@ export async function createFediSnippet(
 ): Promise<void> {
   const userResource = await getUserResource(user);
   if (typeof userResource !== 'undefined') {
-    console.dir(userResource);
-    
     const actor = userResource.actor;
-    console.dir(actor);
     const date = new Date();
     const content =
-      `<p><b>${user.username}</b> created a snippet:</p>` +
+      `<p>Pwyll user <b>${user.username}</b> created a new snippet:</p>` +
       `<p>-<i> ${snippet.description}</i>:\n` +
       `<b>$</b> <code>${snippet.snippet}</code></p>`;
     const apNote: APNote = {
@@ -60,7 +53,7 @@ export async function createFediSnippet(
     };
 
     const activityId = await saveActivityOrNote(activity);
-    const followers = await getFollowers();
+    const followers = await getFollowers(userResource.pwyllUserId);
     if (followers?.length) {
       for (const follower of followers) {
         await send(actor, follower.actor, {
@@ -79,19 +72,21 @@ export const PUBLIC_KEY = keypair.publicKey.export({
   type: 'spki',
   format: 'pem',
 });
-const PRIVATE_KEY = 
-  keypair.privateKey.export({ type: 'pkcs8', format: 'pem' });
+const PRIVATE_KEY = keypair.privateKey.export({ type: 'pkcs8', format: 'pem' });
 
 /** Fetches and returns an actor at a URL. */
 // TODO: this s giving issues on a mastodon real server
 // maybe we can blame ngrok about the dealy
 // Also maybe swap to another fetch alternative, axios?
+
 async function fetchActor(url: string) {
   logger.debug(`fetch actor: ${url}`);
   const res = await fetch(url, {
     headers: { accept: APP_ACTV_JSON },
   });
 
+  // TODO: when fetching a user is failing several times
+  // delete it
   if (res.status < 200 || 299 < res.status) {
     logger.error(`Received ${res.status} fetching actor.`);
     // throw new Error(`Received ${res.status} fetching actor.`);
@@ -108,46 +103,48 @@ async function fetchActor(url: string) {
  * @param message the body of the request to send.
  */
 export async function send(
-    sender: string, 
-    recipient: string, 
-    message: object
-): Promise<fetch.Response> {
+  sender: string,
+  recipient: string,
+  message: object
+): Promise<fetch.Response | undefined> {
   const url = new URL(recipient);
   const actor = await fetchActor(recipient);
-  const fragment = actor.inbox.replace('https://' + url.hostname, '');
-  const body = JSON.stringify(message);
-  const digest = crypto.createHash('sha256').update(body).digest('base64');
-  const d = new Date();
+  if (typeof actor !== 'undefined') {
+    const fragment = actor?.inbox.replace('https://' + url.hostname, '');
+    const body = JSON.stringify(message);
+    const digest = crypto.createHash('sha256').update(body).digest('base64');
+    const d = new Date();
 
-  const key = crypto.createPrivateKey(PRIVATE_KEY.toString());
-  const data = [
-    `(request-target): post ${fragment}`,
-    `host: ${url.hostname}`,
-    `date: ${d.toUTCString()}`,
-    `digest: SHA-256=${digest}`,
-  ].join('\n');
-  const signature = crypto
-    .sign('sha256', Buffer.from(data), key)
-    .toString('base64');
+    const key = crypto.createPrivateKey(PRIVATE_KEY.toString());
+    const data = [
+      `(request-target): post ${fragment}`,
+      `host: ${url.hostname}`,
+      `date: ${d.toUTCString()}`,
+      `digest: SHA-256=${digest}`,
+    ].join('\n');
+    const signature = crypto
+      .sign('sha256', Buffer.from(data), key)
+      .toString('base64');
 
-  const res = await fetch(actor.inbox, {
-    method: 'POST',
-    headers: {
-      host: url.hostname,
-      date: d.toUTCString(),
-      digest: `SHA-256=${digest}`,
-      'content-type': 'application/json',
-      signature: `keyId="${sender}#main-key",headers="(request-target) host date digest",signature="${signature}"`,
-      accept: 'application/json',
-    },
-    body,
-  });
+    const res = await fetch(actor.inbox, {
+      method: 'POST',
+      headers: {
+        host: url.hostname,
+        date: d.toUTCString(),
+        digest: `SHA-256=${digest}`,
+        'content-type': 'application/json',
+        signature: `keyId="${sender}#main-key",headers="(request-target) host date digest",signature="${signature}"`,
+        accept: 'application/json',
+      },
+      body,
+    });
 
-  if (res.status < 200 || 299 < res.status) {
-    throw new Error(res.statusText + ': ' + (await res.text()));
+    if (res.status < 200 || 299 < res.status) {
+      throw new Error(res.statusText + ': ' + (await res.text()));
+    }
+
+    return res;
   }
-
-  return res;
 }
 
 /** Verifies that a request came from an actor.
@@ -156,7 +153,7 @@ export async function send(
  * @returns The actor's ID. */
 export async function verify(
   req: express.Request
-): Promise<string> {
+): Promise<string | undefined> {
   // get headers included in signature
   const included: Record<string, string> = {};
   for (const header of req.get('signature')?.split(',') ?? []) {
@@ -192,29 +189,31 @@ export async function verify(
 
   // get the actor's public key
   const actor = await fetchActor(keyId);
-  if (!actor.publicKey) throw new Error('No public key found.');
-  const key = crypto.createPublicKey(actor.publicKey.publicKeyPem);
+  if (typeof actor !== 'undefined') {
+    if (!actor.publicKey) throw new Error('No public key found.');
+    const key = crypto.createPublicKey(actor.publicKey.publicKeyPem);
 
-  // reconstruct the signed header string
-  const comparison = signedHeaders
-    .split(' ')
-    .map(header => {
-      if (header === '(request-target)')
-        return '(request-target): post ' + req.baseUrl + req.path;
-      return `${header}: ${req.get(header)}`;
-    })
-    .join('\n');
-  const data = Buffer.from(comparison);
+    // reconstruct the signed header string
+    const comparison = signedHeaders
+      .split(' ')
+      .map(header => {
+        if (header === '(request-target)')
+          return '(request-target): post ' + req.baseUrl + req.path;
+        return `${header}: ${req.get(header)}`;
+      })
+      .join('\n');
+    const data = Buffer.from(comparison);
 
-  // verify the signature against the headers using the actor's public key
-  const verified = crypto.verify('sha256', data, key, signature);
-  if (!verified) throw new Error('Invalid request signature.');
+    // verify the signature against the headers using the actor's public key
+    const verified = crypto.verify('sha256', data, key, signature);
+    if (!verified) throw new Error('Invalid request signature.');
 
-  // ensure the request was made recently
-  const now = new Date();
-  const date = new Date(req.get('date') ?? 0);
-  if (now.getTime() - date.getTime() > 30_000)
-    throw new Error('Request date too old.');
+    // ensure the request was made recently
+    const now = new Date();
+    const date = new Date(req.get('date') ?? 0);
+    if (now.getTime() - date.getTime() > 30_000)
+      throw new Error('Request date too old.');
 
-  return actor.id;
+    return actor.id;
+  }
 }

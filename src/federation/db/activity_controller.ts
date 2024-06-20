@@ -7,7 +7,8 @@ import { APActivity, APNote, APRoot } from 'activitypub-types';
 import { CREATE } from '../utils/fedi.constants';
 
 const collectionName = String(
-    config.get('mongodb.collections.federation.snippets'));
+  config.get('mongodb.collections.federation.snippets')
+);
 
 export async function saveActivityOrNote(
   activityOrNote: APNote | APRoot<APActivity>

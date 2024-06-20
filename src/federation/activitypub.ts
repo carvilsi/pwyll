@@ -8,20 +8,14 @@ import { PUBLIC_KEY } from './handlers';
 
 const DOMAIN = config.get('federation.domain');
 
-import { 
-  send, 
-  verify 
-} from './handlers';
+import { send, verify } from './handlers';
 import {
   APP_ACTV_JSON,
   CONTEXT,
   CONTEXT_SEC,
   TO_PUBLIC,
 } from './utils/fedi.constants';
-import { 
-  getActivities, 
-  getActivity 
-} from './db/activity_controller';
+import { getActivities, getActivity } from './db/activity_controller';
 import {
   createFollower,
   getFollowers,
@@ -55,9 +49,9 @@ router.get(
             cc: [],
           })),
         };
-  
+
         logger.debug(activityToSend);
-  
+
         return res.contentType(APP_ACTV_JSON).json(activityToSend);
       }
     }
@@ -73,10 +67,11 @@ router.post(
       const ur = userResource as UserResource;
       const actor = ur.actor;
       /** If the request successfully verifies against the public key, `from` is the actor who sent it. */
-      let from = '';
+      let from;
       try {
         // verify the signed HTTP request
         from = await verify(req);
+        if (typeof from === 'undefined') throw new Error('wrong verification');
       } catch (err) {
         logger.error(err);
         return res.sendStatus(401);
@@ -98,14 +93,14 @@ router.post(
               actor,
               object: body,
             });
-            createFollower(body.actor, body.id);
+            createFollower(body.actor, body.id, ur);
             break;
           }
 
           // implement unfollow
           case 'undo': {
             if (body.object.type === 'Follow') {
-              unFollower(body.actor);
+              unFollower(body.actor, ur);
             }
 
             break;
@@ -117,7 +112,8 @@ router.post(
 
       return res.sendStatus(204);
     }
-});
+  }
+);
 
 router.get(
   '/:actor/followers',
@@ -130,7 +126,7 @@ router.get(
       // TODO: Implement the pagination!
       const page = req.query.page;
 
-      const followers = await getFollowers();
+      const followers = await getFollowers(ur.pwyllUserId);
 
       if (typeof followers === 'undefined') {
         res.json();
@@ -157,51 +153,16 @@ router.get(
         });
       }
     }
-});
+  }
+);
 
-// TODO: Remove this since Pwyll will not follow anyone
-// activitypub.get('/:actor/following', async (req, res) => {
-//   const actor: string = req.app.get('actor');
-
-//   if (req.params.actor !== ACCOUNT) return res.sendStatus(404);
-//   const page = req.query.page;
-
-//   const following = listFollowing();
-
-//   res.contentType(APP_ACTV_JSON);
-
-//   if (!page) {
-//     return res.json({
-//       '@context': 'https://www.w3.org/ns/activitystreams',
-//       id: `${actor}/following`,
-//       type: 'OrderedCollection',
-//       totalItems: following.length,
-//       first: `${actor}/following?page=1`,
-//     });
-//   }
-
-//   return res.json({
-//     '@context': 'https://www.w3.org/ns/activitystreams',
-//     id: `${actor}/following?page=${page}`,
-//     type: 'OrderedCollectionPage',
-//     partOf: `${actor}/following`,
-//     totalItems: following.length,
-//     orderedItems: following.map((follow) => follow.actor),
-//   });
-// });
-
-router.get(
-  '/:actor', 
-  async (
-    req: express.Request, 
-    res: express.Response
-) => {
+router.get('/:actor', async (req: express.Request, res: express.Response) => {
   const userResource = await userExists(req.params.actor, req, res);
 
   if (typeof userResource !== 'undefined') {
     const ur = userResource as UserResource;
     const actor = ur.actor;
-    
+
     return res.contentType(APP_ACTV_JSON).json({
       ...CONTEXT_SEC,
       id: actor,
@@ -230,12 +191,13 @@ router.get(
       const actor = ur.actor;
       const activity = await getActivity(req.params.id);
       if (!activity) return res.sendStatus(404);
-  
+
       return res.contentType(APP_ACTV_JSON).json({
         ...activity.content,
         id: `${actor}/posts/${req.params.id}`,
       });
     }
-});
+  }
+);
 
 export default router;
