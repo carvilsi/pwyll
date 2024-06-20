@@ -2,23 +2,34 @@ import { logger } from '../../util';
 import { getCollection } from '../../db/mongo';
 import config from 'config';
 import { errorControllerHandler } from '../../errorHandlers';
+import { ObjectId } from 'mongodb';
+
+const collectionName = String(
+  config.get('mongodb.collections.federation.followers')
+);
 
 export async function createFollower(
   actor: string,
-  uri: string
+  uri: string,
+  userResource: UserResource
 ): Promise<void> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
     const collection = await getCollection(collectionName);
+    const pwyllUser: PwyllUser = {
+      _id: userResource.pwyllUserId,
+      username: userResource.username,
+    };
     const follower: Follower = {
       actor,
       uri,
       createdAt: new Date().toISOString(),
+      pwyllUser,
     };
     const insertResult = await collection.updateOne(
-      { actor: actor },
+      {
+        actor: actor,
+        pwyllUser: pwyllUser,
+      },
       { $set: follower },
       { upsert: true }
     );
@@ -29,13 +40,21 @@ export async function createFollower(
   }
 }
 
-export async function getFollowers(): Promise<Follower[] | undefined> {
+/**
+ * Returns the followers of a Pwyll user
+ * @param userId
+ * @returns array of Followers or undefined
+ */
+export async function getFollowers(
+  userId: ObjectId
+): Promise<Follower[] | undefined> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
     const collection = await getCollection(collectionName);
-    const results = await collection.find().toArray();
+    const results = await collection
+      .find({
+        'pwyllUser._id': userId,
+      })
+      .toArray();
     const followers: Follower[] = [];
     if (results != null) {
       for (const result of results) {
@@ -53,13 +72,20 @@ export async function getFollowers(): Promise<Follower[] | undefined> {
   }
 }
 
-export async function unFollower(actor: string): Promise<void> {
+export async function unFollower(
+  actor: string,
+  userResource: UserResource
+): Promise<void> {
   try {
-    const collectionName = String(
-      config.get('mongodb.collections.federation.followers')
-    );
     const collection = await getCollection(collectionName);
-    const deleteResult = await collection.deleteOne({ actor: actor });
+    const pwyllUser: PwyllUser = {
+      _id: userResource.pwyllUserId,
+      username: userResource.username,
+    };
+    const deleteResult = await collection.deleteOne({
+      actor: actor,
+      pwyllUser: pwyllUser,
+    });
     logger.debug('Deleted follower =>', deleteResult);
   } catch (error) {
     errorControllerHandler(error);

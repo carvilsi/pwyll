@@ -1,3 +1,5 @@
+// TODO: remove this
+/* eslint no-console:off */
 import express from 'express';
 import helmet from 'helmet';
 import config from 'config';
@@ -14,6 +16,7 @@ import { getDb } from './db/mongo';
 import webfinger from './federation/webfinger';
 import activitypub from './federation/activitypub';
 import { APP_ACTV_JSON } from './federation/utils/fedi.constants';
+import { getUsersResource } from './federation/utils';
 
 // all CORS requests
 const app = express();
@@ -23,14 +26,6 @@ app.use(helmet());
 app.use(morgan('tiny'));
 
 const http = require('http').createServer(app);
-
-// TODO: run test and remove this thingy
-// app.use(express.json({
-//   type: [
-//     "application/json",
-//     APP_ACTV_JSON
-//   ]
-// }));
 
 app.use(
   express.text({
@@ -53,9 +48,6 @@ const port = config.get('port');
 const mongoIP = config.get('mongodb.ip');
 const mongoPort = config.get('mongodb.port');
 
-const DOMAIN = config.get('federation.domain');
-const ACCOUNT = config.get('federation.account');
-
 async function main() {
   try {
     http.listen(port, async () => {
@@ -69,7 +61,15 @@ async function main() {
       logger.info(
         `connected to MongoDB ${db.databaseName}@${mongoIP}:${mongoPort}`
       );
-      logger.info(`find me at fediverse: \n@${ACCOUNT}@${DOMAIN}`);
+      const usersResources = await getUsersResource();
+      if (usersResources?.length) {
+        logger.info('find one of these Pwyll users at fediverse:');
+        for (const userResource of usersResources) {
+          const fediUser = userResource.fediUser;
+          logger.info(fediUser);
+          console.log(fediUser);
+        }
+      }
     });
   } catch (error) {
     logger.error(error);
