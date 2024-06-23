@@ -5,7 +5,7 @@ import { findUserByID } from './users_controller';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
 import { ObjectId } from 'mongodb';
-import { createFediSnippet } from '../federation/handlers';
+import { createFediSnippet, deleteFediSnippet } from '../federation/handlers';
 
 const collectionName = String(config.get('mongodb.collections.snippets'));
 const limitFind = Number(config.get('mongodb.limit'));
@@ -161,8 +161,20 @@ export async function deleteSnippetByID(
       }
       const objectId = new ObjectId(snippetID);
       const result = await collection?.deleteOne({ _id: objectId });
+      console.log('COMMAND TO DELETE');
+      console.log('COMMAND TO DELETE');
+      console.log('COMMAND TO DELETE');
+      console.log('COMMAND TO DELETE');
+      
+      console.dir(command);
+      
       if (result != null) {
-        if (result.acknowledged && result.deletedCount === 1) return true;
+        if (result.acknowledged && 
+            result.deletedCount === 1 &&
+            typeof user !== 'undefined') {
+          await deleteFediSnippet(objectId, user);
+          return true
+        };
       } else {
         return false;
       }

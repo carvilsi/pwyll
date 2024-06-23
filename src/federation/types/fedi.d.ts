@@ -35,3 +35,9 @@ type UndoAction = {
   type: string;
   postId: string;
 };
+
+type DeleteAction = {
+  postId: string;
+  published: string;
+  updated: string;
+}

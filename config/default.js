@@ -9,7 +9,7 @@ module.exports = {
     // be sure you know what are you doing
     argon2TimeCost: 4,
     argon2Parallelism: 5,
-    enableSecretPolicies: true,
+    enableSecretPolicies: false,
     secretPolicies: {
       commonPassword: false,
       passwordLength: 20,
@@ -45,6 +45,6 @@ module.exports = {
   },
   federation: {
     // change this with your domain
-    domain: 'c30c-31-221-188-65.ngrok-free.app',
+    domain: '935f-31-221-188-65.ngrok-free.app',
   },
 };

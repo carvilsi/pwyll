@@ -33,7 +33,8 @@ export async function saveActivityOrNote(
 export async function getActivities(): Promise<Activity[] | undefined> {
   try {
     const collection = await getCollection(collectionName);
-    const results = await collection.find({ 'content.type': CREATE }).toArray();
+    const results = 
+      await collection.find({ 'content.type': CREATE }).toArray();
     const activities: Activity[] = [];
     if (results != null) {
       for (const result of results) {
@@ -69,6 +70,29 @@ export async function getActivity(id: string): Promise<Activity | undefined> {
   }
 }
 
+export async function getSnippetDeleteActivityByPwyllSnippetId(
+  _id: ObjectId,
+): Promise<DeleteAction | undefined> {
+  try {
+    const collection = await getCollection(collectionName);
+    const result = await collection.findOne(
+      { $and: [
+        { 'content.type': CREATE },
+        { snippetId: _id },
+      ]});
+    if (result != null) {
+      const deleteAction: DeleteAction = {
+        postId: result.content.object.id,
+        published: result.published,
+        updated:  new Date().toISOString(),
+      }
+      return deleteAction;
+    }
+  } catch (error) { 
+    errorControllerHandler(error);
+  }
+}
+
 export async function getPwyllSnippetByActivityId(
   id: string
 ): Promise<ObjectId | undefined> {
@@ -80,6 +104,18 @@ export async function getPwyllSnippetByActivityId(
     if (result != null) {
       return result.snippetId;
     }
+  } catch (error) {
+    errorControllerHandler(error);
+  }
+}
+
+export async function deleteActivityAndNoteBySnippetPwyllId(
+  _id: ObjectId,
+): Promise<void | undefined> {
+  try {
+    const collection = await getCollection(collectionName);
+    const results = await collection.deleteMany({ snippetId: _id });
+    logger.debug(results);
   } catch (error) {
     errorControllerHandler(error);
   }

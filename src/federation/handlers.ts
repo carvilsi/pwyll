@@ -3,18 +3,22 @@ import express from 'express';
 import fetch from 'node-fetch';
 import { assert } from 'superstruct';
 import { Actor } from './types/activityPubTypes';
-import { APActivity, APNote, APRoot } from 'activitypub-types';
+import { APActivity, APDelete, APNote, APRoot } from 'activitypub-types';
 import {
   APP_ACTV_JSON,
   CONTEXT,
   CREATE,
   TO_PUBLIC,
 } from './utils/fedi.constants';
-import { saveActivityOrNote } from './db/activity_controller';
 import { getFollowers } from './db/followers_controller';
 import { getUserResource } from './utils';
 import { logger } from '../util';
 import { ObjectId } from 'mongodb';
+import { 
+  deleteActivityAndNoteBySnippetPwyllId, 
+  getSnippetDeleteActivityByPwyllSnippetId, 
+  saveActivityOrNote 
+} from './db/activity_controller';
 
 export async function createFediSnippet(
   snippet: Snippet,
@@ -66,6 +70,42 @@ export async function createFediSnippet(
         });
       }
     }
+  }
+}
+
+export async function deleteFediSnippet(
+  snippetId: ObjectId,
+  user: User,
+): Promise<void> {
+  // TODO
+  // delete the fediverse snippet
+  // delete the fediverse note
+  // create the fediverse delete activity????????
+  // send the fediverse delete activity
+  const deleteActivity = 
+    await getSnippetDeleteActivityByPwyllSnippetId(snippetId);
+  const userResource = await getUserResource(user);
+  
+  if (typeof deleteActivity !== 'undefined' &&
+      typeof userResource !== 'undefined') {
+        await deleteActivityAndNoteBySnippetPwyllId(snippetId);
+        const delActivity: APRoot<APDelete> = {
+          ...CONTEXT,
+          type: 'Delete',
+          id: deleteActivity.postId,
+          published: deleteActivity.published,
+          updated: deleteActivity.updated,
+        };
+        const followers = await getFollowers(userResource.pwyllUserId);
+        if (followers?.length) {
+          for (const follower of followers) {
+            await send(userResource.actor, follower.actor, {
+              ...delActivity,
+              id: delActivity.id,
+              cc: [follower.actor],
+            });
+          }
+        }
   }
 }
 
