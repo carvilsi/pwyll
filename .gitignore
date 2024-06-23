@@ -4,3 +4,4 @@ lib/
 tags
 coverage/
 export-file.json
+update-example.json
