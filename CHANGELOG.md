@@ -1,5 +1,10 @@
 # Changelog
 
+# [v5.0.1](https://github.com/carvilsi/pwyll/releases/tag/v5.0.1) (2024-08-23)
+
+- fixes axios CVE-2024-39338
+- adding code of conduct and contributing
+
 # [v5.0.0](https://github.com/carvilsi/pwyll/releases/tag/v5.0.0) (2024-06-06)
 
 - added secret policies
