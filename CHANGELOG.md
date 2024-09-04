@@ -1,5 +1,9 @@
 # Changelog
 
+# [v5.0.2](https://github.com/carvilsi/pwyll/releases/tag/v5.0.2) (2024-09-04)
+
+- improves query, allowing multiple words
+
 # [v5.0.1](https://github.com/carvilsi/pwyll/releases/tag/v5.0.1) (2024-08-23)
 
 - fixes axios CVE-2024-39338
