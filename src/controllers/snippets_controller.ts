@@ -1,4 +1,4 @@
-import { logger } from '../util';
+import { logger, buildRegExp } from '../util';
 import { getCollection } from '../db/mongo';
 import config from 'config';
 import { findUserByID } from './users_controller';
@@ -45,21 +45,21 @@ export async function findSnippetByQuery(
     if (userID != null) {
       user = await findUserByID(userID);
     }
-    const regExp = new RegExp(`${search}`, 'im');
+    const regExp = buildRegExp(search);
     let mongoQuery;
     if (user != null) {
       mongoQuery = {
         $or: [
-          { snippet: { $regex: regExp } },
-          { description: { $regex: regExp } },
+          { snippet: { $regex: regExp, $options: 'ixm' } },
+          { description: { $regex: regExp, $options: 'ixm' } },
         ],
         $and: [{ user: user }],
       };
     } else {
       mongoQuery = {
         $or: [
-          { snippet: { $regex: regExp } },
-          { description: { $regex: regExp } },
+          { snippet: { $regex: regExp, $options: 'ixm' } },
+          { description: { $regex: regExp, $options: 'ixm' } },
         ],
       };
     }
