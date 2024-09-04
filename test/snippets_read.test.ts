@@ -72,6 +72,16 @@ describe('snippets read (find)', () => {
     expect(response.length).toBeGreaterThanOrEqual(2);
   });
 
+  test('should find a snippet with different words', async () => {
+    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
+      .get('/snippet/find')
+      .query({ q: 'dev typescript' })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(200);
+    const response = JSON.parse(res.text);
+    expect(response.length).toBeGreaterThanOrEqual(1);
+  });
+
   test('should find a snippet restricted to first user', async () => {
     const res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .get('/snippet/find')
