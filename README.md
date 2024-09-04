@@ -19,7 +19,7 @@ Pwyll server needs a MongoDB connection in order to store the snippets.
 
 ### Docker
 
-No doubt about that one of the most useful ways to run it is with Docker. There is a Docker volume, so the data will be persisted.
+No doubt about that this one is the most useful way to run it. There is a Docker volume, so the data will be persisted.
 
 At the **devops** directory, run the following command, which will start the pwyll server and MongoDB:
 
