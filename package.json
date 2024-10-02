@@ -1,6 +1,6 @@
 {
   "name": "pwyll",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
@@ -25,7 +25,7 @@
   "dependencies": {
     "argon2": "^0.40.3",
     "bluebird": "^3.7.2",
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "config": "^3.3.11",
     "cors": "^2.8.5",
     "express": "^4.19.2",
