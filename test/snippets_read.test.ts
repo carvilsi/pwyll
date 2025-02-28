@@ -28,7 +28,7 @@ describe('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -40,14 +40,14 @@ describe('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -59,7 +59,6 @@ describe('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
   });
 
   test('should find a snippet for any user', async () => {

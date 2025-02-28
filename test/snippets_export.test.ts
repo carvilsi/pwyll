@@ -10,7 +10,7 @@ import axios from 'axios';
 import { finished } from 'node:stream/promises';
 import { unlink } from 'node:fs/promises';
 
-describe.skip('snippets export', () => {
+describe('snippets export', () => {
   let firstSnippetID: string;
   let secondSnippetID: string;
   let firstUserID: string;
@@ -29,7 +29,7 @@ describe.skip('snippets export', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -38,7 +38,7 @@ describe.skip('snippets export', () => {
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+
     firstSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -51,7 +51,6 @@ describe.skip('snippets export', () => {
       .set('Accept', 'application/json');
     secondSnippetID = JSON.parse(res.text);
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
   });
 
   test('should export a json file with all snippet for a user', async () => {
@@ -69,17 +68,18 @@ describe.skip('snippets export', () => {
       fs.readFileSync(testGlobals.__EXPORT_FILE__, 'utf-8')
     );
     let count = 0;
-    expect(exportedJSON[count]._id).toBe(firstSnippetID);
+
+    expect(exportedJSON[count].id).toBe(firstSnippetID);
     expect(exportedJSON[count].snippet).toBe(snippetObj.snippet);
     expect(exportedJSON[count].description).toBe(snippetObj.description);
-    expect(exportedJSON[count].user.username).toBe(firstUsername);
-    expect(exportedJSON[count].user._id).toBe(firstUserID);
+    expect(exportedJSON[count].username).toBe(firstUsername);
+    expect(exportedJSON[count].userId).toBe(firstUserID);
     count++;
-    expect(exportedJSON[count]._id).toBe(secondSnippetID);
+    expect(exportedJSON[count].id).toBe(secondSnippetID);
     expect(exportedJSON[count].snippet).toBe(secondSnippetObj.snippet);
     expect(exportedJSON[count].description).toBe(secondSnippetObj.description);
-    expect(exportedJSON[count].user.username).toBe(firstUsername);
-    expect(exportedJSON[count].user._id).toBe(firstUserID);
+    expect(exportedJSON[count].username).toBe(firstUsername);
+    expect(exportedJSON[count].userId).toBe(firstUserID);
   });
 
   test('should not export snippets without a valid userID', async () => {

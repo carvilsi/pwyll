@@ -89,12 +89,19 @@ router.get(
         if (err) throw err;
         const query = new QueryStream(allSnippetsForUser, [user?._id]);
         const stream = client?.query(query);
-        //release the client when the stream is finished
+        let counter = 0;
         stream?.on('end', () => {
           done();
+          res.write(']');
           res.end();
         });
-        res.pipe(stream?.pipe(JSONStream.stringify()));
+        stream?.on('data', (data: any) =>{
+          console.dir(data);
+          if (counter === 0) res.write('[');
+          res.write(JSON.stringify(data));
+          if (counter < data.total - 1) res.write(',');
+          counter++;
+        });
       });
     } catch (e) {
       errorRouteHandler(e, next);

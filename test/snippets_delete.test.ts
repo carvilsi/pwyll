@@ -29,7 +29,7 @@ describe('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -41,14 +41,14 @@ describe('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -60,13 +60,15 @@ describe('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     secondUserSnippetID = JSON.parse(res.text);
   });
 
   test('should delete a snippet by id and for second user', async () => {
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .delete(`/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`)
+      .delete(
+        `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
+      )
       .set('Accept', 'application/json');
     let response = JSON.parse(res.text);
     expect(res.statusCode).toBe(200);
@@ -81,7 +83,6 @@ describe('snippets delete', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     response = JSON.parse(res.text);
-    console.log(response);
     expect(response.length).toBe(0);
   });
 

@@ -21,7 +21,7 @@ const config: Config = {
     ],
   },
 
-  silent: false,
+  silent: true,
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 

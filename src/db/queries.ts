@@ -68,12 +68,16 @@ export const snippetFindForUser = `
 export const allSnippetsForUser = `
   SELECT
   	c.id,
-  	c.command,
+    c.user_id AS "userId",
+  	c.command AS snippet,
   	c.description,
   	c.stars,
   	c.created_at,
-  	c.updated_at
+  	c.updated_at,
+    u.username,
+    COUNT(*) OVER() AS total
   FROM commands c
+  JOIN users u ON u.id = c.user_id
   WHERE c.user_id = $1;
 `;
 

@@ -30,7 +30,7 @@ describe('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -42,14 +42,14 @@ describe('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
+
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -61,7 +61,6 @@ describe('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    
   });
 
   test('should update a snippet by id and for first user', async () => {
