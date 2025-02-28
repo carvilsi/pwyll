@@ -10,6 +10,7 @@ import {
   snippetFindAnyUser,
   snippetFindById,
   snippetFindForUser,
+  snippetUpdate,
 } from '../db/queries';
 
 const limitFind = Number(config.get('postgresql.limit'));
@@ -143,8 +144,8 @@ export async function deleteSnippetByID(
 }
 
 export async function updateSnippet(
-  snippetUpdate: string,
-  descriptionUpdate: string,
+  updatedSnippet: string,
+  updatedDescription: string,
   id: string,
   userID: string,
   secret: string
@@ -153,8 +154,8 @@ export async function updateSnippet(
     if (
       id != null &&
       userID != null &&
-      snippetUpdate != null &&
-      descriptionUpdate != null &&
+      updatedSnippet != null &&
+      updatedDescription != null &&
       secret != null
     ) {
       const user = await findUserByID(userID, secret);
@@ -172,8 +173,8 @@ export async function updateSnippet(
         }
       }
       const result = await db.query(snippetUpdate, [
-        snippetUpdate,
-        descriptionUpdate,
+        updatedSnippet,
+        updatedDescription,
         id,
       ]);
       if (

@@ -37,10 +37,10 @@ export function errorControllerHandler(error: unknown) {
     logger.error(error.message);
     throw new Error(error.message);
   } else if (error instanceof Error) {
-    logger.error(error);
-    if (/nvalid input syntax for type integer/.test(error.message)) {
+    if (/invalid input syntax for type integer/.test(error.message)) {
       throw new Error('invalid id format');
     }
+    logger.error(error);
     throw new Error(error.message);
   } else {
     throw error;

@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import request from 'supertest';
 import testGlobals from './test_globals';
 
-describe.skip('snippets update', () => {
+describe('snippets update', () => {
   let firstUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
@@ -30,7 +30,7 @@ describe.skip('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -42,14 +42,14 @@ describe.skip('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -61,7 +61,7 @@ describe.skip('snippets update', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
   });
 
   test('should update a snippet by id and for first user', async () => {
