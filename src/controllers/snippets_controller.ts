@@ -46,7 +46,7 @@ export async function findSnippetByQuery(
     let user;
     let results;
 
-    const q = `${search}:*`;
+    const q = search.trim().split(/\s+/).join(':* & ').concat(':*');
 
     if (userID != null) {
       user = await findUserByID(userID);
