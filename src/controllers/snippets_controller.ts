@@ -1,32 +1,34 @@
-import { logger, buildRegExp } from '../util';
-import { getCollection } from '../db/mongo';
+import { logger } from '../util';
 import config from 'config';
 import { findUserByID } from './users_controller';
 import _ from 'lodash';
 import { errorControllerHandler } from '../errorHandlers';
-import { ObjectId } from 'mongodb';
+import * as db from '../db/';
+import {
+  snippetCreate,
+  snippetDelete,
+  snippetFindAnyUser,
+  snippetFindById,
+  snippetFindForUser,
+} from '../db/queries';
 
-const collectionName = String(config.get('mongodb.collections.snippets'));
-const limitFind = Number(config.get('mongodb.limit'));
+const limitFind = Number(config.get('postgresql.limit'));
 
 export async function createSnippet(
   snippet: string,
   description: string,
   userID: string,
   secret: string
-): Promise<ObjectId | undefined> {
+): Promise<Number | undefined> {
   try {
-    const collection = await getCollection(collectionName);
     const user = await findUserByID(userID, secret);
-    const command: Snippet = {
-      snippet: snippet,
-      description: description,
-      user: user,
-    };
-    const insertResult = await collection.insertOne(command);
-    logger.debug('Inserted documents =>', insertResult);
-    const id: ObjectId = insertResult.insertedId;
-    return id;
+    const result = await db.query(snippetCreate, [
+      snippet,
+      description,
+      user?._id,
+    ]);
+    logger.debug('Inserted documents =>', result.rows[0]);
+    return result.rows[0].id as unknown as Number;
   } catch (error) {
     errorControllerHandler(error);
   }
@@ -37,44 +39,30 @@ export async function findSnippetByQuery(
   userID?: string
 ): Promise<Snippet[] | undefined> {
   try {
-    const collection = await getCollection(collectionName);
     logger.debug(
       `try to find snippets for: ${search} and for user: ${userID!}`
     );
+
     let user;
+    let results;
+
+    const q = `${search}:*`;
+
     if (userID != null) {
       user = await findUserByID(userID);
-    }
-    const regExp = buildRegExp(search);
-    let mongoQuery;
-    if (user != null) {
-      mongoQuery = {
-        $or: [
-          { snippet: { $regex: regExp, $options: 'ixm' } },
-          { description: { $regex: regExp, $options: 'ixm' } },
-        ],
-        $and: [{ user: user }],
-      };
+      results = await db.query(snippetFindForUser, [q, user?._id, limitFind]);
     } else {
-      mongoQuery = {
-        $or: [
-          { snippet: { $regex: regExp, $options: 'ixm' } },
-          { description: { $regex: regExp, $options: 'ixm' } },
-        ],
-      };
+      results = await db.query(snippetFindAnyUser, [q, limitFind]);
     }
-    const results = await collection
-      ?.find(mongoQuery)
-      .limit(limitFind)
-      .toArray();
+
     const snippets: Snippet[] = [];
     if (results != null) {
-      for (const result of results) {
+      for (const result of results.rows) {
         const snippet: Snippet = {
-          snippet: result.snippet,
+          snippet: result.command,
           description: result.description,
-          _id: result._id,
-          username: result.user.username,
+          _id: result.id,
+          username: result.username,
         };
         snippets.push(snippet);
       }
@@ -85,43 +73,24 @@ export async function findSnippetByQuery(
   }
 }
 
-export async function exportSnippets(
-  userID?: string
-): Promise<ExportSnippetsResposne | undefined> {
-  try {
-    const collection = await getCollection(collectionName);
-    logger.debug(`try to export snippets for user: ${userID!}`);
-    let user;
-    if (userID != null) {
-      user = await findUserByID(userID);
-    }
-    const count = await collection?.countDocuments({ user: user });
-    const cursor = collection?.find({ user: user });
-    const exportResponse: ExportSnippetsResposne = {
-      streamContent: cursor.stream(),
-      count,
-    };
-    return exportResponse;
-  } catch (error) {
-    errorControllerHandler(error);
-  }
-}
-
 export async function findSnippetByID(
   snippetID: string
 ): Promise<Snippet | string | undefined> {
   try {
     if (snippetID != null) {
-      const collection = await getCollection(collectionName);
       logger.debug(`try to find commands with id: ${snippetID}`);
-      const objectId = new ObjectId(snippetID);
-      const result = await collection?.findOne({ _id: objectId });
-      if (result != null) {
+      const results = await db.query(snippetFindById, [snippetID]);
+      if (results.rows.length) {
+        const result = results.rows[0];
+        const user: User = {
+          username: result.username,
+          _id: result.userId,
+        };
         const snippet: Snippet = {
-          snippet: result.snippet,
+          snippet: result.command,
           description: result.description,
-          _id: result._id,
-          user: result.user,
+          _id: result.id,
+          user,
         };
         return snippet;
       } else {
@@ -141,13 +110,13 @@ export async function deleteSnippetByID(
   secret: string
 ): Promise<boolean | undefined> {
   try {
-    const collection = await getCollection(collectionName);
     if (snippetID != null && userID != null && secret != null) {
       const user = await findUserByID(userID, secret);
       const command = await findSnippetByID(snippetID);
       if (command != null) {
         if (typeof command === 'string')
           throw new Error('Command not found for deleting command');
+
         if (
           !_.isEqual(command.user!._id, user?._id) ||
           command.user!.username !== user?.username
@@ -155,10 +124,13 @@ export async function deleteSnippetByID(
           throw new Error('Wrong user provided for deleting snippet');
         }
       }
-      const objectId = new ObjectId(snippetID);
-      const result = await collection?.deleteOne({ _id: objectId });
-      if (result != null) {
-        if (result.acknowledged && result.deletedCount === 1) return true;
+      const result = await db.query(snippetDelete, [snippetID]);
+      if (
+        result != null &&
+        result.rowCount === 1 &&
+        result.command === 'DELETE'
+      ) {
+        return true;
       } else {
         return false;
       }
@@ -178,7 +150,6 @@ export async function updateSnippet(
   secret: string
 ): Promise<boolean | undefined> {
   try {
-    const collection = await getCollection(collectionName);
     if (
       id != null &&
       userID != null &&
@@ -200,16 +171,17 @@ export async function updateSnippet(
           throw new Error('Wrong user provided for deleting snippet');
         }
       }
-      const objectId = new ObjectId(id);
-      const snippet: Snippet = {
-        snippet: snippetUpdate,
-        description: descriptionUpdate,
-      };
-      const result = await collection.updateOne({ _id: objectId }, [
-        { $set: snippet },
+      const result = await db.query(snippetUpdate, [
+        snippetUpdate,
+        descriptionUpdate,
+        id,
       ]);
-      if (result != null) {
-        if (result.acknowledged && result.matchedCount === 1) return true;
+      if (
+        result != null &&
+        result.rowCount === 1 &&
+        result.command === 'UPDATE'
+      ) {
+        return true;
       } else {
         return false;
       }

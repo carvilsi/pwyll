@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import testGlobals from './test_globals';
 import request from 'supertest';
 
-describe.skip('snippets create', () => {
+describe('snippets create', () => {
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
@@ -26,7 +26,6 @@ describe.skip('snippets create', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -38,7 +37,6 @@ describe.skip('snippets create', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
     secondUserID = JSON.parse(res.text);
   });
 
@@ -48,7 +46,6 @@ describe.skip('snippets create', () => {
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
   });
 
   test('should create another snippet for second user', async () => {
@@ -62,7 +59,6 @@ describe.skip('snippets create', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
   });
 
   test('should not create a snippet if provided user does not exists', async () => {

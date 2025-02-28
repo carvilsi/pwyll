@@ -72,7 +72,9 @@ export function secretPoliciesCheck(
     if (Object.hasOwn(results, property)) {
       if (!isNaN(parseFloat(secretPolicies[property]))) {
         if (results[property] < secretPolicies[property]) {
-          passwordWeakness = `${passwordWeakness} \n - The ${property} should be greater or equal to ${secretPolicies[property]}`;
+          passwordWeakness =
+            `${passwordWeakness} \n - The ${property} ` +
+            `should be greater or equal to ${secretPolicies[property]}`;
           weak = true;
         }
       }

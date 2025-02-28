@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import request from 'supertest';
 import testGlobals from './test_globals';
 
-describe.skip('snippets read (find)', () => {
+describe('snippets read (find)', () => {
   let firstUserSnippetID: string;
   let firstUserID: string;
   let secondUserID: string;
@@ -28,7 +28,7 @@ describe.skip('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -40,14 +40,14 @@ describe.skip('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -59,7 +59,7 @@ describe.skip('snippets read (find)', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
   });
 
   test('should find a snippet for any user', async () => {

@@ -38,11 +38,7 @@ export function errorControllerHandler(error: unknown) {
     throw new Error(error.message);
   } else if (error instanceof Error) {
     logger.error(error);
-    if (
-      /input must be a 24 character hex string, 12 byte Uint8Array, or an integer/.test(
-        error.message
-      )
-    ) {
+    if (/nvalid input syntax for type integer/.test(error.message)) {
       throw new Error('invalid id format');
     }
     throw new Error(error.message);

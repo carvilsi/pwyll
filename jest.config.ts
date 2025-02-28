@@ -21,7 +21,7 @@ const config: Config = {
     ],
   },
 
-  silent: true,
+  silent: false,
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -112,7 +112,7 @@ const config: Config = {
   // moduleNameMapper: {},
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
-  // modulePathIgnorePatterns: [],
+  modulePathIgnorePatterns: ["config"],
 
   // Activates notifications for test results
   // notify: false,
@@ -175,7 +175,7 @@ const config: Config = {
 
   // The glob patterns Jest uses to detect test files
   // testMatch: [
-  //   "**/__tests__/**/*.[jt]s?(x)",
+    // "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
 

@@ -63,5 +63,4 @@ process.on('SIGINT', async () => {
   logger.info('Closing server...');
   http.close();
   logger.info('Server closed');
-  process.exit(0);
 });

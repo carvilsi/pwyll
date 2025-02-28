@@ -12,7 +12,7 @@ const database = String(config.get('postgresql.db'));
 const MAX_CONNECTIONS = 2;
 const IDLE_TIMEOUT = 0;
 
-const pool = new Pool({
+export const dbConfig = {
   user,
   password,
   host,
@@ -20,12 +20,14 @@ const pool = new Pool({
   database,
   max: MAX_CONNECTIONS,
   idleTimeoutMillis: IDLE_TIMEOUT,
-});
+};
+
+export const pool = new Pool(dbConfig);
 
 export const query = (text: string, params: any[]) => {
   return pool.query(text, params);
 };
 
-export const close = () => { 
+export const close = () => {
   return pool.end();
 };

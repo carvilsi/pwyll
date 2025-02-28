@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import request from 'supertest';
 import testGlobals from './test_globals';
 
-describe.skip('snippets delete', () => {
+describe('snippets delete', () => {
   let firstUserSnippetID: string;
   let secondUserSnippetID: string;
   let firstUserID: string;
@@ -29,7 +29,7 @@ describe.skip('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
@@ -41,14 +41,14 @@ describe.skip('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     secondUserID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     firstUserSnippetID = JSON.parse(res.text);
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .post('/snippet')
@@ -60,19 +60,18 @@ describe.skip('snippets delete', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
+    
     secondUserSnippetID = JSON.parse(res.text);
   });
 
   test('should delete a snippet by id and for second user', async () => {
     let res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .delete(
-        `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
-      )
+      .delete(`/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`)
       .set('Accept', 'application/json');
     let response = JSON.parse(res.text);
     expect(res.statusCode).toBe(200);
     expect(response).toBe(true);
+
     res = await request(testGlobals.__PYWLL_SERVER_URL__)
       .get('/snippet/find')
       .query({
@@ -82,6 +81,7 @@ describe.skip('snippets delete', () => {
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
     response = JSON.parse(res.text);
+    console.log(response);
     expect(response.length).toBe(0);
   });
 

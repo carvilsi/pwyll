@@ -35,7 +35,8 @@ router.post(
       secretExistenceCheck(secret);
       if (ENABLE_SECRET_POLICIES) secretPoliciesCheck(secret);
       const id = await createUser(username, secret);
-      res.sendStatus(200).send(id);
+      res.statusCode = 200;
+      res.send(String(id));
     } catch (e) {
       errorRouteHandler(e, next);
     }
