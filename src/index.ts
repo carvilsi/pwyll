@@ -9,7 +9,7 @@ import { errorRequestHandler } from './errorHandlers';
 import snippets from './routes/snippets';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
-import { close } from './db/postgresql';
+import { close } from './db';
 
 // all CORS requests
 const app = express();

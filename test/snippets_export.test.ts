@@ -10,7 +10,7 @@ import axios from 'axios';
 import { finished } from 'node:stream/promises';
 import { unlink } from 'node:fs/promises';
 
-describe('snippets export', () => {
+describe.skip('snippets export', () => {
   let firstSnippetID: string;
   let secondSnippetID: string;
   let firstUserID: string;

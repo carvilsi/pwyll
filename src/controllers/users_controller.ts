@@ -1,26 +1,18 @@
 import { logger } from './../util';
-import { getCollection } from './../db/mongo';
-import { ObjectId } from 'mongodb';
-import config from 'config';
 import { UserIdentityError, errorControllerHandler } from '../errorHandlers';
 import { getArgon2Hash, validateArgon2Hash } from '../util/security';
-
-const collectionName = String(config.get('mongodb.collections.users'));
+import * as db from '../db/'
+import { userCreate, userFindById, userFindByName } from '../db/queries';
 
 export async function createUser(
   username: string,
   secret: string
-): Promise<ObjectId | undefined> {
+): Promise<Number | undefined> {
   try {
-    const collection = await getCollection(collectionName);
-    const user: User = {
-      username: username,
-      secret: await getArgon2Hash(secret),
-    };
-    const insertResult = await collection.insertOne(user);
-    logger.debug('Inserted user =>', insertResult);
-    const id: ObjectId = insertResult.insertedId;
-    return id;
+      const hash = await getArgon2Hash(secret);
+    const res = await db.query(userCreate, [username, hash]);
+    logger.debug('Inserted user =>', res.rows[0]);
+    return res.rows[0].id as unknown as Number;
   } catch (error) {
     errorControllerHandler(error);
   }
@@ -31,24 +23,20 @@ export async function findUserByID(
   secret?: string
 ): Promise<User | undefined> {
   try {
-    const collection = await getCollection(collectionName);
 
     logger.debug(`try to find user with id: ${userID}`);
-    const objectId = new ObjectId(userID);
-    const userQuery: QueryUser = {
-      _id: objectId,
-    };
+    
+    const result = await db.query(userFindById, [userID]);
 
-    const result = await collection.findOne(userQuery);
-
-    if (result != null) {
+    if (result.rows.length) {
+      const row = result.rows[0];
       const user: User = {
-        username: result.username,
-        _id: result._id,
+        username: row.username,
+        _id: row._id,
       };
 
       if (typeof secret !== 'undefined') {
-        const valid = await validateArgon2Hash(result.secret, secret);
+        const valid = await validateArgon2Hash(row.secret, secret);
         if (!valid) throw new UserIdentityError('Invalid userID or secret');
       }
 
@@ -65,12 +53,12 @@ export async function findUserByName(
   username: string
 ): Promise<User | undefined> {
   try {
-    const collection = await getCollection(collectionName);
     logger.debug(`try to find username: ${username}`);
-    const result = await collection.findOne({ username: username });
-    if (result != null) {
+
+    const result = await db.query(userFindByName, [username]);
+    if (result.rows.length) {
       const user: User = {
-        username: result.username,
+        username
       };
       return user;
     } else {

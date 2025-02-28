@@ -26,7 +26,6 @@ describe('users ', () => {
   test('should create a user', async () => {
     const res = await createUser(name, testGlobals.__STRONG_SECRET__);
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
   });
 
   test('should not allow creating a user if secret is not provided', async () => {

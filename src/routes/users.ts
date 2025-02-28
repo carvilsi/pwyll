@@ -7,10 +7,10 @@ import {
   forbiddenNameCheck,
 } from '../util';
 import { errorRouteHandler } from '../errorHandlers';
-import { createUser } from '../controllers/users_controller';
 import config from 'config';
 import { secretExistenceCheck, secretPoliciesCheck } from '../util/security';
 import { paramCheck } from '../util/routes';
+import { createUser } from '../controllers/users_controller';
 
 const ENABLE_SECRET_POLICIES = Boolean(
   process.env.ENABLE_SECRET_POLICIES ||
@@ -35,7 +35,7 @@ router.post(
       secretExistenceCheck(secret);
       if (ENABLE_SECRET_POLICIES) secretPoliciesCheck(secret);
       const id = await createUser(username, secret);
-      res.status(200).send(id);
+      res.sendStatus(200).send(id);
     } catch (e) {
       errorRouteHandler(e, next);
     }

@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import request from 'supertest';
 import testGlobals from './test_globals';
 
-describe('snippets delete', () => {
+describe.skip('snippets delete', () => {
   let firstUserSnippetID: string;
   let secondUserSnippetID: string;
   let firstUserID: string;

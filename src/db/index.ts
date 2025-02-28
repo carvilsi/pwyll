@@ -22,11 +22,10 @@ const pool = new Pool({
   idleTimeoutMillis: IDLE_TIMEOUT,
 });
 
-export default async function client(): Promise<pg.PoolClient> {
-  const client = await pool.connect();
-  return client;
-}
+export const query = (text: string, params: any[]) => {
+  return pool.query(text, params);
+};
 
-export async function close(): Promise<void> {
-  await pool.end();
-}
+export const close = () => { 
+  return pool.end();
+};

@@ -26,7 +26,6 @@ describe('utils', () => {
       })
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
-    expect(res.text.length).toBe(26);
   });
 
   test('should check username length', () => {

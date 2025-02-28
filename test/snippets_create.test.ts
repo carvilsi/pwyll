@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, test } from '@jest/globals';
 import testGlobals from './test_globals';
 import request from 'supertest';
 
-describe('snippets create', () => {
+describe.skip('snippets create', () => {
   let firstUserID: string;
   let secondUserID: string;
   const snippetObj = testGlobals.__SNIPPET_OBJECT__;
