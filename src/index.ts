@@ -9,7 +9,7 @@ import { errorRequestHandler } from './errorHandlers';
 import snippets from './routes/snippets';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
-import { getDb } from './db/mongo';
+import { close } from './db/postgresql';
 
 // all CORS requests
 const app = express();
@@ -28,8 +28,9 @@ app.use(infoapp);
 app.use(errorRequestHandler);
 
 const port = config.get('port');
-const mongoIP = config.get('mongodb.ip');
-const mongoPort = config.get('mongodb.port');
+const postgresIP = config.get('postgresql.ip');
+const postgresPort = config.get('postgresql.port');
+const postgresDB = config.get('postgresql.db');
 
 async function main() {
   try {
@@ -40,9 +41,8 @@ async function main() {
       logger.info('    ┛     ┛  ');
       logger.info('by carvilsi with <3');
       logger.info(`${info.name}@${info.version} running at: ${port}!`);
-      const db = getDb();
       logger.info(
-        `connected to MongoDB ${db.databaseName}@${mongoIP}:${mongoPort}`
+        `connected to PostgreSQL ${postgresDB}@${postgresIP}:${postgresPort}`
       );
     });
   } catch (error) {
@@ -51,3 +51,17 @@ async function main() {
 }
 
 main();
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('SIGINT', async () => {
+  logger.info('Closing database connection...');
+  await close();
+  logger.info('Database connection closed');
+  logger.info('Closing server...');
+  http.close();
+  logger.info('Server closed');
+  process.exit(0);
+});

@@ -1,5 +1,5 @@
 module.exports = {
-  port: 46520,
+  port: 46521,
   logLevel: 'DEBUG',
   security: {
     // positivelly you want to change this, here or override on production.js
@@ -39,4 +39,12 @@ module.exports = {
     },
     limit: 5,
   },
+  postgresql: {
+    user: 'postgres',
+    password: 'postgres',
+    ip: 'localhost',
+    port: 5432,
+    db: 'pwyllpoc',
+    limit: 5,
+  }
 };
