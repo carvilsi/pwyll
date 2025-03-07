@@ -1,6 +1,6 @@
 {
   "name": "pwyll",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "A snippet manager service",
   "main": "./lib/index.js",
   "scripts": {
