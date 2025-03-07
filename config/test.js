@@ -1,5 +1,5 @@
 module.exports = {
   postgresql: {
-    ip: 'postgresql-test',
+    ip: 'pg-test',
   },
 };
