@@ -30,13 +30,3 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
   return true;
 }
 
-export function buildRegExp(search: string): RegExp {
-  let regExp;
-  const splitted = search.trim().replace(/\s+/g, ' ').split(' ');
-  if (splitted.length) {
-    regExp = new RegExp(`${splitted.join('|')}`);
-  } else {
-    regExp = new RegExp(`${search}`);
-  }
-  return regExp;
-}

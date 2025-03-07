@@ -2,6 +2,8 @@ CREATE DATABASE pwyll;
 
 \c pwyll
 
+-- table creations
+
 CREATE TABLE IF NOT EXISTS public.users (
 	id serial4 NOT NULL,
 	username text NOT NULL,
@@ -24,6 +26,17 @@ CREATE TABLE IF NOT EXISTS public.commands (
 );
 
 ALTER TABLE public.commands ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+CREATE TABLE IF NOT EXISTS public.pwyll_meta (
+	id serial4 NOT NULL,
+	server_version text NOT NULL,
+	created_at timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT pwyll_meta_pkey PRIMARY KEY (id)
+);
+
+INSERT INTO pwyll_meta (server_version) VALUES ('6.0.0');
+
+-- function and triggers
 
 CREATE OR REPLACE FUNCTION fn_update_at_on_update()
 RETURNS TRIGGER

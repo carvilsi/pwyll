@@ -26,25 +26,12 @@ module.exports = {
     'anyone',
     'pwyll'
   ],
-  mongodb: {
-    user: 'root',
-    // positivelly you want to change this, here or override on production.js
-    password: 'pwy11',
-    ip: 'localhost',
-    port: 27017,
-    db: 'pwyll',
-    collections: {
-      snippets: 'snippets',
-      users: 'users',
-    },
-    limit: 5,
-  },
   postgresql: {
     user: 'postgres',
     password: 'postgres',
     ip: 'localhost',
     port: 5432,
-    db: 'pwyllpoc',
+    db: 'pwyll',
     limit: 5,
   }
 };

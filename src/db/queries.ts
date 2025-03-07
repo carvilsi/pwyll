@@ -93,3 +93,15 @@ export const snippetUpdate = `
     description = $2
   WHERE id = $3;
 `;
+
+export const currentDB = `
+  SELECT current_database() AS "currentDB";
+`
+
+export const pwyllMeta = `
+  SELECT 
+    * 
+  FROM pwyll_meta 
+  ORDER BY id 
+  DESC LIMIT 1;
+`

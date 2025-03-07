@@ -10,9 +10,11 @@ import snippets from './routes/snippets';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
 import { close } from './db';
+import * as db from './db/';
+import { currentDB, pwyllMeta } from './db/queries';
 
 // all CORS requests
-const app = express();
+export const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(helmet());
@@ -30,7 +32,6 @@ app.use(errorRequestHandler);
 const port = config.get('port');
 const postgresIP = config.get('postgresql.ip');
 const postgresPort = config.get('postgresql.port');
-const postgresDB = config.get('postgresql.db');
 
 async function main() {
   try {
@@ -41,8 +42,10 @@ async function main() {
       logger.info('    ┛     ┛  ');
       logger.info('by carvilsi with <3');
       logger.info(`${info.name}@${info.version} running at: ${port}!`);
+      const database = await db.query(currentDB, []);
+      const databaseVers = await db.query(pwyllMeta, []);
       logger.info(
-        `connected to PostgreSQL ${postgresDB}@${postgresIP}:${postgresPort}`
+        `connected to PostgreSQL ${database.rows[0].currentDB}.${databaseVers.rows[0].id}@${postgresIP}:${postgresPort}`
       );
     });
   } catch (error) {
