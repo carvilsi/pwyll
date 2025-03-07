@@ -24,7 +24,8 @@ module.exports = {
   },
   forbiddenUserNames: [
     'anyone',
-    'pwyll'
+    'pwyll',
+    'char',
   ],
   postgresql: {
     user: 'postgres',

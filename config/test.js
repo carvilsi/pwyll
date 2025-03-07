@@ -1,5 +1,5 @@
 module.exports = {
-  mongodb: {
-    ip: 'mongo-test',
+  postgresql: {
+    ip: 'postgresql-test',
   },
 };

@@ -9,15 +9,3 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_PASSWORD=postgres
-    
-  pwyll-test:
-    build:
-      context: ./../
-      args:
-        NODE_ENV: tests
-    restart: always
-    ports:
-    - '46520:46520'
-    depends_on:
-      - pg-test
-    
