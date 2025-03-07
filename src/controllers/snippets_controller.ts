@@ -47,6 +47,12 @@ export async function findSnippetByQuery(
     let user;
     let results;
 
+    const snippets: Snippet[] = [];
+    
+    if (!search.trim().length) {
+      return snippets;
+    }
+
     const q = search.trim().split(/\s+/).join(':* & ').concat(':*');
 
     if (userID != null) {
@@ -56,7 +62,6 @@ export async function findSnippetByQuery(
       results = await db.query(snippetFindAnyUser, [q, limitFind]);
     }
 
-    const snippets: Snippet[] = [];
     if (results != null) {
       for (const result of results.rows) {
         const snippet: Snippet = {

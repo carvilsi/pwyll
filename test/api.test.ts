@@ -624,6 +624,18 @@ describe('snippets read (find)', () => {
     expect(JSON.parse(res.text).length).toBe(0);
   });
 
+  test('should not find a snippet if query is empty', async () => {
+    const res = await request(server)
+      .get('/snippet/find')
+      .query({
+        q: '',
+        userID: firstUserID,
+      })
+      .set('Accept', 'application/json');
+    expect(res.statusCode).toBe(200);
+    expect(JSON.parse(res.text).length).toBe(0);
+  });
+
   test('should retrieve a snippet by snippet ID', async () => {
     const res = await request(server)
       .get(`/snippet/${firstUserSnippetID}`)
