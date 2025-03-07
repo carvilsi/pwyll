@@ -28,6 +28,6 @@ export const query = (text: string, params: any[]) => {
   return pool.query(text, params);
 };
 
-export const close = () => {
+export const closeDB = () => {
   return pool.end();
 };

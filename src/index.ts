@@ -9,7 +9,7 @@ import { errorRequestHandler } from './errorHandlers';
 import snippets from './routes/snippets';
 import infoapp from './routes/infoapp';
 import users from './routes/users';
-import { close } from './db';
+import { closeDB } from './db';
 import * as db from './db/';
 import { currentDB, pwyllMeta } from './db/queries';
 
@@ -59,11 +59,15 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-process.on('SIGINT', async () => {
-  logger.info('Closing database connection...');
-  await close();
-  logger.info('Database connection closed');
+export function close() {
   logger.info('Closing server...');
   http.close();
   logger.info('Server closed');
+}
+
+process.on('SIGINT', async () => {
+  logger.info('Closing database connection...');
+  await closeDB();
+  logger.info('Database connection closed');
+  await close();
 });

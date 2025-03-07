@@ -1,32 +1,19 @@
 /* eslint-disable node/no-unpublished-import */
 /* eslint-disable no-undef */
 /* eslint-disable node/no-unpublished-require */
-import { beforeAll, describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from '@jest/globals';
 import {
   userLengthCheck,
   userExistenceCheck,
   forbiddenNameCheck,
 } from './../src/util';
 import testGlobals from './test_globals';
-import request from 'supertest';
 
 const Chance = require('chance');
 
 describe('utils', () => {
   const chance = new Chance();
   const firstUser = chance.name();
-  const firstUserSecret = testGlobals.__STRONG_SECRET__;
-
-  beforeAll(async () => {
-    const res = await request(testGlobals.__PYWLL_SERVER_URL__)
-      .post('/user')
-      .send({
-        username: firstUser,
-        secret: firstUserSecret,
-      })
-      .set('Accept', 'application/json');
-    expect(res.statusCode).toBe(200);
-  });
 
   test('should check username length', () => {
     const res = userLengthCheck('peter');
