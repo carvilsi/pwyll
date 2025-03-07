@@ -11,7 +11,6 @@ import {
 } from '../controllers/snippets_controller';
 import { findUserByID } from '../controllers/users_controller';
 import QueryStream from 'pg-query-stream';
-import JSONStream from 'JSONStream';
 import { pool } from '../db';
 import { allSnippetsForUser } from '../db/queries';
 
@@ -95,8 +94,7 @@ router.get(
           res.write(']');
           res.end();
         });
-        stream?.on('data', (data: any) =>{
-          console.dir(data);
+        stream?.on('data', (data: any) => {
           if (counter === 0) res.write('[');
           res.write(JSON.stringify(data));
           if (counter < data.total - 1) res.write(',');

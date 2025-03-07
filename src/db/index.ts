@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import pg from 'pg';
 import config from 'config';
 
@@ -24,6 +26,7 @@ export const dbConfig = {
 
 export const pool = new Pool(dbConfig);
 
+// TODO: modify param as optional
 export const query = (text: string, params: any[]) => {
   return pool.query(text, params);
 };

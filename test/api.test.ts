@@ -6,7 +6,7 @@ const pckg = require('./../package.json');
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals';
 import request, { Response } from 'supertest';
 import testGlobals from './test_globals';
-import { app, close } from '../src/index';
+import { server } from '../src/index';
 import { unlink } from 'fs/promises';
 import axios from 'axios';
 import fs from 'node:fs';
@@ -16,7 +16,7 @@ async function createUser(
   username?: string,
   secret?: string
 ): Promise<Response> {
-  return await request(app)
+  return await request(server)
     .post('/user')
     .send({
       username: username,
@@ -26,19 +26,19 @@ async function createUser(
 }
 
 afterAll(() => {
-    close();
+  server.close();
 });
 
 describe('get the info', () => {
   test('should retieve info text', async () => {
-    const response = await request(app).get('/');
+    const response = await request(server).get('/');
     expect(response.statusCode).toBe(200);
     const regexp = new RegExp(`${pckg.name}@${pckg.version}`, 'i');
     expect(response.text).toMatch(regexp);
   });
 
   test('should retieve info object', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/info')
       .set('Accept', 'application/json');
     const response = JSON.parse(res.text);
@@ -135,7 +135,7 @@ describe('snippets create', () => {
   const secondUserSecret = testGlobals.__SECOND_STRONG_SECRET__;
 
   beforeAll(async () => {
-    let res = await request(app)
+    let res = await request(server)
       .post('/user')
       .send({
         username: firstUser,
@@ -146,7 +146,7 @@ describe('snippets create', () => {
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
-    res = await request(app)
+    res = await request(server)
       .post('/user')
       .send({
         username: secondtUser,
@@ -158,7 +158,7 @@ describe('snippets create', () => {
   });
 
   test('should create a snippet for first user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
@@ -166,7 +166,7 @@ describe('snippets create', () => {
   });
 
   test('should create another snippet for second user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({
         snippet: secondSnippetObj.snippet,
@@ -179,7 +179,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if provided user does not exists', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({
         snippet: 'ls',
@@ -193,7 +193,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if provided userID has an invalid format', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({
         snippet: 'ls',
@@ -207,7 +207,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if provided secret is not correct', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({
         snippet: 'ls',
@@ -221,7 +221,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if user is not provided', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({ snippet: 'ls', description: 'list' })
       .set('Accept', 'application/json');
@@ -230,7 +230,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if secret is not provided', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({ snippet: 'ls', description: 'list', userID: firstUserID })
       .set('Accept', 'application/json');
@@ -239,7 +239,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if snippet is not provided', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({ description: 'list' })
       .set('Accept', 'application/json');
@@ -248,7 +248,7 @@ describe('snippets create', () => {
   });
 
   test('should not create a snippet if description is not provided', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .post('/snippet')
       .send({ snippet: 'ls' })
       .set('Accept', 'application/json');
@@ -274,7 +274,7 @@ describe('snippets delete', () => {
   const fakeSnippetID = testGlobals.__FAKE_ID__;
 
   beforeAll(async () => {
-    let res = await request(app)
+    let res = await request(server)
       .post('/user')
       .send({
         username: firstUser,
@@ -286,7 +286,7 @@ describe('snippets delete', () => {
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
-    res = await request(app)
+    res = await request(server)
       .post('/user')
       .send({
         username: secondtUser,
@@ -296,14 +296,14 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
 
     secondUserID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
 
     firstUserSnippetID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send({
         snippet: secondSnippetObj.snippet,
@@ -318,7 +318,7 @@ describe('snippets delete', () => {
   });
 
   test('should delete a snippet by id and for second user', async () => {
-    let res = await request(app)
+    let res = await request(server)
       .delete(
         `/snippet/${secondUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
@@ -327,7 +327,7 @@ describe('snippets delete', () => {
     expect(res.statusCode).toBe(200);
     expect(response).toBe(true);
 
-    res = await request(app)
+    res = await request(server)
       .get('/snippet/find')
       .query({
         q: 'nodemon',
@@ -340,7 +340,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet without existing snippetID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(`/snippet/${fakeSnippetID}/${secondUserID}/${secondUserSecret}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -348,7 +348,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet without a valid snippetID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(
         `/snippet/${testGlobals.__INVALID_ID__}/${secondUserID}/${secondUserSecret}`
       )
@@ -358,7 +358,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet with valid snippetID but wrong user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(
         `/snippet/${firstUserSnippetID}/${secondUserID}/${secondUserSecret}`
       )
@@ -368,7 +368,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet without existing userID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(
         `/snippet/${secondUserSnippetID}/${fakeSnippetID}/${secondUserSecret}`
       )
@@ -378,7 +378,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet without valid userID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(
         `/snippet/${secondUserSnippetID}/secondUserIdWrong/${secondUserSecret}`
       )
@@ -388,7 +388,7 @@ describe('snippets delete', () => {
   });
 
   test('should not delete a snippet with valid snippetID but userID from another user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .delete(
         `/snippet/${secondUserSnippetID}/${firstUserID}/${secondUserSecret}`
       )
@@ -409,7 +409,7 @@ describe('snippets export', () => {
   const firstUserSecret = testGlobals.__STRONG_SECRET__;
 
   beforeAll(async () => {
-    let res = await request(app)
+    let res = await request(server)
       .post('/user')
       .send({
         username: firstUsername,
@@ -421,14 +421,14 @@ describe('snippets export', () => {
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
 
     firstSnippetID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send({
         snippet: secondSnippetObj.snippet,
@@ -471,14 +471,14 @@ describe('snippets export', () => {
   });
 
   test('should not export snippets without a valid userID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get(`/snippet/export?userID=${testGlobals.__INVALID_ID__}`)
       .expect(500);
     expect(res.text).toMatch(/invalid id format/);
   });
 
   test('should not export snippets with valid snippetID but wrong user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get(`/snippet/export?userID=${testGlobals.__FAKE_ID__}`)
       .expect(500);
     expect(res.text).toMatch(/Invalid userID or secret/);
@@ -503,7 +503,7 @@ describe('snippets read (find)', () => {
   const fakeSnippetID = testGlobals.__FAKE_ID__;
 
   beforeAll(async () => {
-    let res = await request(app)
+    let res = await request(server)
       .post('/user')
       .send({
         username: firstUser,
@@ -515,7 +515,7 @@ describe('snippets read (find)', () => {
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
-    res = await request(app)
+    res = await request(server)
       .post('/user')
       .send({
         username: secondtUser,
@@ -525,14 +525,14 @@ describe('snippets read (find)', () => {
     expect(res.statusCode).toBe(200);
 
     secondUserID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
 
     firstUserSnippetID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send({
         snippet: secondSnippetObj.snippet,
@@ -545,7 +545,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should find a snippet for any user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({ q: 'nodemon' })
       .set('Accept', 'application/json');
@@ -555,7 +555,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should find a snippet with different words', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({ q: 'dev typescript' })
       .set('Accept', 'application/json');
@@ -565,7 +565,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should find a snippet restricted to first user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({
         q: 'nodemon',
@@ -581,7 +581,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not find a snippet restricted to invalid userID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({
         q: 'nodemon',
@@ -593,7 +593,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not find a snippet restricted to non existing userID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({
         q: 'nodemon',
@@ -605,7 +605,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not find a snippet if query is not provided', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -613,7 +613,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not find a snippet by query if does not match any', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get('/snippet/find')
       .query({
         q: 'foobar',
@@ -625,7 +625,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should retrieve a snippet by snippet ID', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get(`/snippet/${firstUserSnippetID}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
@@ -636,7 +636,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not retrieve a snippet because snippet ID does not exist', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get(`/snippet/${fakeSnippetID}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -644,7 +644,7 @@ describe('snippets read (find)', () => {
   });
 
   test('should not retrieve a snippet because snippet ID is not valid', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .get(`/snippet/${testGlobals.__INVALID_ID__}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(500);
@@ -668,7 +668,7 @@ describe('snippets update', () => {
   const newDescription = 'list with hidden files and details';
 
   beforeAll(async () => {
-    let res = await request(app)
+    let res = await request(server)
       .post('/user')
       .send({
         username: firstUser,
@@ -680,7 +680,7 @@ describe('snippets update', () => {
     firstUserID = JSON.parse(res.text);
     snippetObj.userID = firstUserID;
     snippetObj.secret = firstUserSecret;
-    res = await request(app)
+    res = await request(server)
       .post('/user')
       .send({
         username: secondtUser,
@@ -690,14 +690,14 @@ describe('snippets update', () => {
     expect(res.statusCode).toBe(200);
 
     secondUserID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send(snippetObj)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
 
     firstUserSnippetID = JSON.parse(res.text);
-    res = await request(app)
+    res = await request(server)
       .post('/snippet')
       .send({
         snippet: secondSnippetObj.snippet,
@@ -710,7 +710,7 @@ describe('snippets update', () => {
   });
 
   test('should update a snippet by id and for first user', async () => {
-    let res = await request(app)
+    let res = await request(server)
       .put('/snippet')
       .send({
         snippet: newCommand,
@@ -723,7 +723,7 @@ describe('snippets update', () => {
     expect(res.statusCode).toBe(200);
     let response = JSON.parse(res.text);
     expect(response).toBe(true);
-    res = await request(app)
+    res = await request(server)
       .get(`/snippet/${firstUserSnippetID}`)
       .set('Accept', 'application/json');
     expect(res.statusCode).toBe(200);
@@ -734,7 +734,7 @@ describe('snippets update', () => {
   });
 
   test('should not update a snippet for other user', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .put('/snippet')
       .send({
         snippet: newCommand,
@@ -749,7 +749,7 @@ describe('snippets update', () => {
   });
 
   test('should not update a snippet if secret is not valid', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .put('/snippet')
       .send({
         snippet: newCommand,
@@ -764,7 +764,7 @@ describe('snippets update', () => {
   });
 
   test('should not update a snippet if ID does not exist', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .put('/snippet')
       .send({
         snippet: newCommand,
@@ -779,7 +779,7 @@ describe('snippets update', () => {
   });
 
   test('should no update a snippet if ID is not valid', async () => {
-    const res = await request(app)
+    const res = await request(server)
       .put('/snippet')
       .send({
         snippet: newCommand,

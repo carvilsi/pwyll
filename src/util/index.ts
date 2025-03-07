@@ -29,4 +29,3 @@ export async function userExistenceCheck(username: string): Promise<boolean> {
     throw `User ${username} already exists, please choose a different one; not case sensitive`;
   return true;
 }
-

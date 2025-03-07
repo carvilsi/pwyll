@@ -1,3 +1,6 @@
+/* eslint-disable no-process-exit */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import express from 'express';
 import helmet from 'helmet';
 import config from 'config';
@@ -14,7 +17,7 @@ import * as db from './db/';
 import { currentDB, pwyllMeta } from './db/queries';
 
 // all CORS requests
-export const app = express();
+const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(helmet());
@@ -33,9 +36,11 @@ const port = config.get('port');
 const postgresIP = config.get('postgresql.ip');
 const postgresPort = config.get('postgresql.port');
 
+export let server: any;
+
 async function main() {
   try {
-    http.listen(port, async () => {
+    server = http.listen(port, async () => {
       logger.info('           ┓┓');
       logger.info('    ┏┓┓┏┏┓┏┃┃');
       logger.info('    ┣┛┗┻┛┗┫┗┗');
@@ -45,7 +50,8 @@ async function main() {
       const database = await db.query(currentDB, []);
       const databaseVers = await db.query(pwyllMeta, []);
       logger.info(
-        `connected to PostgreSQL ${database.rows[0].currentDB}.${databaseVers.rows[0].id}@${postgresIP}:${postgresPort}`
+        'connected to PostgreSQL' +
+          `${database.rows[0].currentDB}.${databaseVers.rows[0].id}@${postgresIP}:${postgresPort}`
       );
     });
   } catch (error) {
@@ -59,15 +65,12 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-export function close() {
-  logger.info('Closing server...');
-  http.close();
-  logger.info('Server closed');
-}
-
 process.on('SIGINT', async () => {
+  logger.info('Closing server...');
+  server.close();
+  logger.info('Server closed');
   logger.info('Closing database connection...');
   await closeDB();
   logger.info('Database connection closed');
-  await close();
+  process.exit(0);
 });

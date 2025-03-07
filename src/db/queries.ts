@@ -96,7 +96,7 @@ export const snippetUpdate = `
 
 export const currentDB = `
   SELECT current_database() AS "currentDB";
-`
+`;
 
 export const pwyllMeta = `
   SELECT 
@@ -104,4 +104,4 @@ export const pwyllMeta = `
   FROM pwyll_meta 
   ORDER BY id 
   DESC LIMIT 1;
-`
+`;
