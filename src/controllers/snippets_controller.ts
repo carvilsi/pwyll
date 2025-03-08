@@ -48,7 +48,7 @@ export async function findSnippetByQuery(
     let results;
 
     const snippets: Snippet[] = [];
-    
+
     if (!search.trim().length) {
       return snippets;
     }
