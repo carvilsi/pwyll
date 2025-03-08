@@ -32,7 +32,7 @@ type TestGlobals = {
 };
 
 const testGlobals: TestGlobals = {
-  __PYWLL_SERVER_URL__: 'http://localhost:46521',
+  __PYWLL_SERVER_URL__: 'http://localhost:46520',
   __SNIPPET_OBJECT__: {
     snippet: 'nodemon -e js,ts -x ts-node --files src/index.ts',
     description: 'dev mode nodemon typescript ts-node',
