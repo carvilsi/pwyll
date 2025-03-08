@@ -1,5 +1,5 @@
 module.exports = {
-  port: 46521,
+  port: 46520,
   logLevel: 'DEBUG',
   security: {
     // positivelly you want to change this, here or override on production.js
