@@ -39,8 +39,11 @@ const config: Config = {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-    "src/util/index.ts",
-    "src/util/security.ts"
+    "src/util/*.ts",
+    "src/controllers/*.ts",
+    "src/routes/*.ts",
+    "src/db/*.ts",
+    "src/errorHandlers/*.ts",
   ],
 
   // The directory where Jest should output its coverage files
@@ -112,7 +115,7 @@ const config: Config = {
   // moduleNameMapper: {},
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
-  // modulePathIgnorePatterns: [],
+  modulePathIgnorePatterns: ["config"],
 
   // Activates notifications for test results
   // notify: false,
@@ -175,7 +178,7 @@ const config: Config = {
 
   // The glob patterns Jest uses to detect test files
   // testMatch: [
-  //   "**/__tests__/**/*.[jt]s?(x)",
+    // "**/__tests__/**/*.[jt]s?(x)",
   //   "**/?(*.)+(spec|test).[tj]s?(x)"
   // ],
 
@@ -206,7 +209,7 @@ const config: Config = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: undefined,
+  verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],

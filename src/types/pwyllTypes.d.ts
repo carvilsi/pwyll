@@ -26,3 +26,5 @@ type ExportSnippetsResposne = {
   streamContent: Readable & AsyncIterable<WithId<Document>>;
   count: number;
 };
+
+declare module 'JSONStream';

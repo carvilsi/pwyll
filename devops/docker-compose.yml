@@ -1,18 +1,19 @@
 services:
-  mongo:
-    image: mongo
-    restart: always
+  postgres:
+    image: postgres:14.5-alpine
+    expose:
+    - "5432"
     ports:
-      - '27017:27017'
+    - "5432:5432"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: 'root'
       # positively change this password db on production
-      MONGO_INITDB_ROOT_PASSWORD: 'pwy11'
+      - POSTGRES_PASSWORD=postgres
     volumes:
-      - ./mongo-volume:/data/db
+      - ./postgres-volume:/var/lib/postgresql/data
+      - ../../db/pwyll-db.sql:/docker-entrypoint-initdb.d/pwyll-db.sql
 
   pwyll:
-    image: carvilsi/pwyll:5.0.2
+    image: carvilsi/pwyll:6.0.0
     restart: always
     ports:
       - '46520:46520'
@@ -21,4 +22,4 @@ services:
       # positively change the pepper value 
       PEPPER_VALUE: 'sBWKMA03SOim+ldnpSBWwx7eDWVIcAjvTV0a2XrFvwqMKw6Jc+HLZA=='
     depends_on:
-      - mongo
+      - postgres 

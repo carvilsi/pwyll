@@ -26,17 +26,6 @@ export function forbiddenNameCheck(username: string): boolean {
 export async function userExistenceCheck(username: string): Promise<boolean> {
   const user = await findUserByName(username);
   if (user != null)
-    throw `User ${username} already exists, please choose a different one`;
+    throw `User ${username} already exists, please choose a different one; not case sensitive`;
   return true;
-}
-
-export function buildRegExp(search: string): RegExp {
-  let regExp;
-  const splitted = search.trim().replace(/\s+/g, ' ').split(' ');
-  if (splitted.length) {
-    regExp = new RegExp(`${splitted.join('|')}`);
-  } else {
-    regExp = new RegExp(`${search}`);
-  }
-  return regExp;
 }

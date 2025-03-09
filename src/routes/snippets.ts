@@ -8,8 +8,11 @@ import {
   findSnippetByID,
   deleteSnippetByID,
   updateSnippet,
-  exportSnippets,
 } from '../controllers/snippets_controller';
+import { findUserByID } from '../controllers/users_controller';
+import QueryStream from 'pg-query-stream';
+import { pool } from '../db';
+import { allSnippetsForUser } from '../db/queries';
 
 // adds a snippet
 // If does not comes with user id will be not possible to do RUD
@@ -28,7 +31,8 @@ router.post(
         req.body.userID,
         req.body.secret
       );
-      res.status(200).send(id);
+      res.statusCode = 200;
+      res.send(String(id));
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -55,7 +59,8 @@ router.get(
       } else {
         snippets = await findSnippetByQuery(String(req.query.q));
       }
-      res.status(200).send(snippets);
+      res.statusCode = 200;
+      res.send(snippets);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -72,22 +77,30 @@ router.get(
   ) => {
     try {
       paramCheck(req, ['userID'], { check: 'query' });
-      const exportSnippetsResposne = await exportSnippets(
-        String(req.query.userID)
-      );
-      if (exportSnippetsResposne != null) {
+
+      const userID = String(req.query.userID);
+      let user: User | undefined;
+      if (userID != null) {
+        user = await findUserByID(userID);
+      }
+
+      pool.connect((err, client, done) => {
+        if (err) throw err;
+        const query = new QueryStream(allSnippetsForUser, [user?._id]);
+        const stream = client?.query(query);
         let counter = 0;
-        exportSnippetsResposne.streamContent.on('data', (data: unknown) => {
-          if (counter === 0) res.write('[');
-          res.write(JSON.stringify(data));
-          if (counter < exportSnippetsResposne.count - 1) res.write(',');
-          counter++;
-        });
-        exportSnippetsResposne.streamContent.on('end', () => {
+        stream?.on('end', () => {
+          done();
           res.write(']');
           res.end();
         });
-      }
+        stream?.on('data', (data: any) => {
+          if (counter === 0) res.write('[');
+          res.write(JSON.stringify(data));
+          if (counter < data.total - 1) res.write(',');
+          counter++;
+        });
+      });
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -112,7 +125,8 @@ router.get(
         description: foundSnippet.description,
         username: foundSnippet.user?.username,
       };
-      res.status(200).send(snippetToSend);
+      res.statusCode = 200;
+      res.send(snippetToSend);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -136,7 +150,8 @@ router.put(
         req.body.userID,
         req.body.secret
       );
-      res.status(200).send(snippet);
+      res.statusCode = 200;
+      res.send(snippet);
     } catch (e) {
       errorRouteHandler(e, next);
     }
@@ -158,7 +173,8 @@ router.delete(
         req.params.userID,
         req.params.secret
       );
-      res.status(200).send(result);
+      res.statusCode = 200;
+      res.send(result);
     } catch (e) {
       errorRouteHandler(e, next);
     }

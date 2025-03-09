@@ -24,19 +24,15 @@ module.exports = {
   },
   forbiddenUserNames: [
     'anyone',
-    'pwyll'
+    'pwyll',
+    'char',
   ],
-  mongodb: {
-    user: 'root',
-    // positivelly you want to change this, here or override on production.js
-    password: 'pwy11',
+  postgresql: {
+    user: 'postgres',
+    password: 'postgres',
     ip: 'localhost',
-    port: 27017,
+    port: 5432,
     db: 'pwyll',
-    collections: {
-      snippets: 'snippets',
-      users: 'users',
-    },
     limit: 5,
-  },
+  }
 };

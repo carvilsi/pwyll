@@ -44,7 +44,7 @@ const testGlobals: TestGlobals = {
     description: 'generic nodemon for source folder changes',
   },
   __INVALID_ID__: '000aa0000a0aa0000a00a23',
-  __FAKE_ID__: '625ae0149d0bd9638b60e498',
+  __FAKE_ID__: '62501',
   __EXPORT_FILE__: 'export-file.json',
   __FORBIDDEN_USER_NAMES__: ['anyone', 'pwyll', 'Anyone', 'PWYLL'],
   __VERY_STRONG_CONGIG_SECRET__: {
