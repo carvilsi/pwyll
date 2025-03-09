@@ -13,7 +13,7 @@ services:
       - ../../db/pwyll-db.sql:/docker-entrypoint-initdb.d/pwyll-db.sql
 
   pwyll:
-    image: carvilsi/pwyll:5.0.2
+    image: carvilsi/pwyll:6.0.0
     restart: always
     ports:
       - '46520:46520'
