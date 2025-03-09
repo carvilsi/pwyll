@@ -61,7 +61,10 @@
         "no-warning-comments": [ 1, {
           "terms": [ "TODO", "FIXME", "XXX" ],
           "location": "start"
-        }]
+        }],
+        "max-len": [ 1, 119 ],
+        "semi": [ 2, "always" ]
+
       },
       "parserOptions": {
         "ecmaVersion": 2022,

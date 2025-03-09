@@ -1,6 +1,8 @@
 node_modules/
 devops/mongo-volume/
+devops/postgres-volume/
 lib/
 tags
 coverage/
 export-file.json
+update-example.json

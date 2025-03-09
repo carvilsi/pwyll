@@ -1,5 +1,20 @@
 # Changelog
 
+# [v6.0.0](https://github.com/carvilsi/pwyll/releases/tag/v6.0.0) (2025-03-09)
+
+- migrated to postgresql database
+- updating body-parser dependency for CVE-2024-45590 and other packages
+- update micromatch dependency for CVE-2024-4067
+
+# [v5.0.2](https://github.com/carvilsi/pwyll/releases/tag/v5.0.2) (2024-09-04)
+
+- improves query, allowing multiple words
+
+# [v5.0.1](https://github.com/carvilsi/pwyll/releases/tag/v5.0.1) (2024-08-23)
+
+- fixes axios CVE-2024-39338
+- adding code of conduct and contributing
+
 # [v5.0.0](https://github.com/carvilsi/pwyll/releases/tag/v5.0.0) (2024-06-06)
 
 - added secret policies
